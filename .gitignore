@@ -2,3 +2,4 @@
 scraper.iml
 resources/log4j.properties
 target/
+.gitignore
