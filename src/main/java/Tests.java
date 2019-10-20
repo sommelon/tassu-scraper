@@ -1,16 +1,5 @@
-import epc_tuke.Inserter;
-import epc_tuke.tabulky.Autor;
-import epc_tuke.tabulky.Ohlas;
-import epc_tuke.tabulky.Zaznam;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,8 +28,94 @@ public class Tests {
 //            System.out.println(e.getText());
 //        }
 
-        //TODO tento zaznam je trocha inak reprezentovany v DOM. Jedna cast nie je medzi span tagmi
-        String ostatne = "Sledovanie vplyvu posypových solí na procesy v aktivačnej nádrži / Eliška Horniaková, Milan Búgel, Tomáš Bakalár - 2010. In: Chemické listy. Vol. 104, no. 4 (2010), p. 257-260. - ISSN 0009-2770 Spôsob prístupu: http://www.chemicke-listy.cz/docs/full/2010_04_257-260.pdf...\n" +
-                "[HORNIAKOVÁ, Eliška (50%) - BÚGEL, Milan (30%) - BAKALÁR, Tomáš (20%)]\n";
+        String ostatne = "<p style=\"font-size: 11px\">\n" +
+                "                                <b>\n" +
+                "                                    <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_lZNazov\">Uskladňovanie tekutých odpadov v horninových štruktúrach</span></b>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_LZNazovP\">/</span>\n" +
+                "                                \n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_lUdajZodpovednosti\">Daniela Marasová ... [et al.]</span>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_lZPokrBezUZ\"> - [1. vyd.] - Košice : TU, FBERG, - 1997. - 114 s. - ISBN 80-88896-11-8.</span>\n" +
+                "                                \n" +
+                "                                  \n" +
+                "                               \n" +
+                "                                      \n" +
+                "                                   <a id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_HyperLink1\" target=\"_blank\"></a>\n" +
+                "                                \n" +
+                "                                \n" +
+                "                                <br>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_lAut\">[MARASOVÁ, Daniela (25%) - PINKA, Ján (25%) - BUJOK, Petr (25%) - KRIŠTÍN, Štefan (25%)]</span>\n" +
+                "                                \n" +
+                "                            </p>";
+
+
+        Matcher m;
+
+        ostatne = ostatne.replaceAll("\n", " ");
+        ostatne = ostatne.replaceAll(" {2,}", " ");
+        int i1 = ostatne.indexOf("ZPokrBezUZ")+12;
+        int i2 = ostatne.indexOf("<a");
+        ostatne = ostatne.substring(i1, i2);
+        String[] ostatneArray = ostatne.split("</span>"); //rozdelenie stringu
+        if (ostatneArray[0].length() > ostatneArray[1].length()){ //ak nema string ziadny text za </span>
+            ostatne = ostatneArray[0];
+        } else { //ak ma string nejaky text za </span>
+            ostatne = ostatneArray[1];
+            ostatne = ostatne.replaceAll(" *Spôsob prístupu: *", "");
+        }
+        ostatne = ostatne.replaceAll("^ +| +$", ""); //odstranenie medzier na zaciatku a na konci
+
+        Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+)");
+        m = ISBNP.matcher(ostatne);
+        if (m.find()) {
+            String ISBN = m.group(1);
+            System.out.println(ISBN);
+        }
+        ostatne = m.replaceAll("");
+
+        Pattern ISSNP = Pattern.compile("ISSN:? ?([0-9]{4}-[0-9]{3}[0-9xX])");
+        m = ISSNP.matcher(ostatne);
+        if (m.find()) {
+            String ISSN = m.group(1);
+            System.out.println(ISSN);
+        }
+        ostatne = m.replaceAll("");
+
+        Pattern stranyP = Pattern.compile("[PSps]\\. ?[0-9]+(-[0-9]+)?"); //najprv sa najde tento vyraz kvoli pripadu ked rok nie je oddeleny nicim okrem medzery (2016 S. 109-114)
+        m = stranyP.matcher(ostatne);
+        if (m.find()) {
+            String strany = m.group(0);
+            System.out.println(strany);
+        } else { //ak sa nenajde ten prvy vzor, tak hlada dalsi vzor
+            stranyP = Pattern.compile("[0-9]+(-[0-9]+)? [PSps]\\.");
+            m = stranyP.matcher(ostatne);
+            if (m.find()) {
+                String strany = m.group(0);
+                System.out.println(strany);
+            }
+        }
+        ostatne = m.replaceAll("");
+
+        Pattern vydanieP = Pattern.compile("- ?(\\[?[0-9]\\.[^-,]+vyd\\.?\\]? ?[^-]*)-");
+        m = vydanieP.matcher(ostatne);
+        if (m.find()) {
+            String vydanie = m.group(1);
+            System.out.println(vydanie);
+        }
+        ostatne = m.replaceAll("");
+//        ostatne = ostatne.replaceAll("[. \\-,]{2,}", " ").trim();
+        System.out.println(ostatne);
+
+//        String[] ohlasyNespracovane = ostatne.split("<br> <br> ");
+//        List<String> ohlasyList = Arrays.asList(ohlasyNespracovane);
+//        List<String> ohlasyList = new ArrayList<String>();
+//
+//        Pattern ohlasyP = Pattern.compile("[0-9]{4}  ?\\[[0-9]{1,2}\\][^<]+");
+//        m = ohlasyP.matcher(ostatne);
+//        while (m.find()){
+//            ohlasyList.add(m.group(0).trim());
+//        }
+//        for (String s1 : ohlasyList) {
+//            System.out.println("s = '" + s1 + "'");
+//        }
     }
 }

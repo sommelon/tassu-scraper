@@ -6,12 +6,12 @@ public class Ohlas {
     private Integer rok_vydania = null;
     private String nazov = "";
     private String zbierka = "";
-    private Integer strana_od = null;
-    private Integer strana_do = null;
+    private String strany = "";
     private String ISBN = "";
     private String ISSN = "";
     private String miesto_vydania = "";
-    private int zaznam_id;
+    private int dielo_id;
+    private int kategoria_ohlasu_id;
 
     public Ohlas() {
         id = counter;
@@ -50,20 +50,12 @@ public class Ohlas {
         this.zbierka = zbierka;
     }
 
-    public Integer getStrana_od() {
-        return strana_od;
+    public String getStrany() {
+        return strany;
     }
 
-    public void setStrana_od(Integer strana_od) {
-        this.strana_od = strana_od;
-    }
-
-    public Integer getStrana_do() {
-        return strana_do;
-    }
-
-    public void setStrana_do(Integer strana_do) {
-        this.strana_do = strana_do;
+    public void setStrany(String strany) {
+        this.strany = strany;
     }
 
     public String getISBN() {
@@ -90,11 +82,19 @@ public class Ohlas {
         this.miesto_vydania = miesto_vydania;
     }
 
-    public int getZaznam_id() {
-        return zaznam_id;
+    public int getDielo_id() {
+        return dielo_id;
     }
 
-    public void setZaznam_id(int zaznam_id) {
-        this.zaznam_id = zaznam_id;
+    public void setDielo_id(int dielo_id) {
+        this.dielo_id = dielo_id;
+    }
+
+    public int getKategoria_ohlasu_id() {
+        return kategoria_ohlasu_id;
+    }
+
+    public void setKategoria_ohlasu_id(int kategoria_ohlasu_id) {
+        this.kategoria_ohlasu_id = kategoria_ohlasu_id;
     }
 }

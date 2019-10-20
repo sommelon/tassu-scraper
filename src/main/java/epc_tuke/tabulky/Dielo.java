@@ -1,21 +1,21 @@
 package epc_tuke.tabulky;
 
-public class Zaznam {
+public class Dielo {
     private static int counter;
     private int id;
     private String archivacne_cislo = "";
     private Integer rok_vydania = null;
     private String nazov = "";
     private String podnazov = "";
+    private String vydanie = "";
     private String ISBN = "";
     private String ISSN = "";
     private String miesto_vydania = "";
     private String klucove_slova = "";
     private String odkaz = "";
-    private Integer strana_od = null;
-    private Integer strana_do = null;
+    private String strany = "";
 
-    public Zaznam() {
+    public Dielo() {
         id = counter;
         counter++;
     }
@@ -60,6 +60,14 @@ public class Zaznam {
         this.podnazov = podnazov;
     }
 
+    public String getVydanie() {
+        return vydanie;
+    }
+
+    public void setVydanie(String vydanie) {
+        this.vydanie = vydanie;
+    }
+
     public String getISBN() {
         return ISBN;
     }
@@ -100,19 +108,11 @@ public class Zaznam {
         this.odkaz = odkaz;
     }
 
-    public Integer getStrana_od() {
-        return strana_od;
+    public String getStrany() {
+        return strany;
     }
 
-    public void setStrana_od(Integer strana_od) {
-        this.strana_od = strana_od;
-    }
-
-    public Integer getStrana_do() {
-        return strana_do;
-    }
-
-    public void setStrana_do(Integer strana_do) {
-        this.strana_do = strana_do;
+    public void setStrany(String strany) {
+        this.strany = strany;
     }
 }

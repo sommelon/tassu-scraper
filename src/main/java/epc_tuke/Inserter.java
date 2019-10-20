@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.List;
 
 public class Inserter {
-    private Zaznam zaznam;
+    private Dielo dielo;
     private List<Autor> autori;
     private List<Integer> podiely;
     private List<Ohlas> ohlasy;
@@ -21,8 +21,8 @@ public class Inserter {
 
     //TODO prerobit, aby to bolo flexibilnejsie. Cudzie kluce by uz mali byt v objektoch a nemali by sa nastavovat v tychto metodach.
     //ohlasy a podiely mozu byt null
-    public Inserter(Zaznam zaznam, List<Autor> autori, List<Integer> podiely, List<Ohlas> ohlasy/*, Fakulta fakulta, Pracovisko pracovisko*/){
-        this.zaznam = zaznam;
+    public Inserter(Dielo dielo, List<Autor> autori, List<Integer> podiely, List<Ohlas> ohlasy/*, Fakulta fakulta, Pracovisko pracovisko*/){
+        this.dielo = dielo;
         this.autori = autori;
         this.podiely = podiely;
         this.ohlasy = ohlasy;
@@ -56,87 +56,89 @@ public class Inserter {
         }
     }
 
-    public void insertIntoZaznam() {
-        String query = "insert into zaznamy (zaznam_id, nazov, archivacne_cislo, rok_vydania, ISBN, miesto_vydania, klucove_slova, odkaz, ISSN, podnazov, strana_od, strana_do, kategoria_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    public void insertIntoDielo() {
+        //todo zmenit zaznam na dielo v DB
+        String query = "insert into diela (dielo_id, nazov, archivacne_cislo, rok_vydania, ISBN, miesto_vydania, klucove_slova, odkaz, ISSN, podnazov, strany, kategoria_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement ps = con.prepareStatement(query);
-            ps.setInt(1, zaznam.getId());
-            ps.setString(2, zaznam.getNazov());
-            ps.setString(3, zaznam.getArchivacne_cislo());
-            ps.setInt(4, zaznam.getRok_vydania());
-            ps.setString(5, zaznam.getISBN());
-            ps.setString(6, zaznam.getMiesto_vydania());
-            ps.setString(7, zaznam.getKlucove_slova());
-            ps.setString(8, zaznam.getOdkaz());
-            ps.setString(9, zaznam.getISSN());
-            ps.setString(10, zaznam.getPodnazov());
-            if (zaznam.getStrana_od() != null)
-                ps.setInt(11, zaznam.getStrana_od());
-            else
-                ps.setNull(11, Types.INTEGER);
-            if (zaznam.getStrana_do() != null)
-                ps.setInt(12, zaznam.getStrana_do());
-            else
-                ps.setNull(12, Types.INTEGER);
-            ps.setInt(13, -1);
+            ps.setInt(1, dielo.getId());
+            ps.setString(2, dielo.getNazov());
+            ps.setString(3, dielo.getArchivacne_cislo());
+            ps.setInt(4, dielo.getRok_vydania());
+            ps.setString(5, dielo.getISBN());
+            ps.setString(6, dielo.getMiesto_vydania());
+            ps.setString(7, dielo.getKlucove_slova());
+            ps.setString(8, dielo.getOdkaz());
+            ps.setString(9, dielo.getISSN());
+            ps.setString(10, dielo.getPodnazov());
+            ps.setString(11, dielo.getStrany());
+            ps.setInt(12, -1);
 
             ps.executeUpdate();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
         }
     }
 
-    public void insertIntoAutor(){
+    public void insertIntoAutor(Autor autor){
         String query = "insert into autori (autor_id, meno, priezvisko) values (?,?,?)";
-        for (Autor autor : autori) {
-            try {
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setInt(1, autor.getId());
-                ps.setString(2, autor.getMeno());
-                ps.setString(3, autor.getPriezvisko());
+        try {
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, autor.getId());
+            ps.setString(2, autor.getMeno());
+            ps.setString(3, autor.getPriezvisko());
 
-                ps.executeUpdate();
-                ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
         }
+        //TODO: close PreparedStatement in a finally block
+//        finally {
+//            ps.close();
+//        }
     }
 
-    public void insertIntoAutorZaznamPracovisko(){
-        String query = "insert into autor_zaznam_pracovisko (autor_id, záznam_id, pracovisko_id, percentualny_podiel) values (?,?,?,?)";
-        for (int i = 0; i < autori.size(); i++) {
-            try {
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setInt(1, autori.get(i).getId());
-                ps.setInt(2, zaznam.getId());
-                ps.setInt(3, -1);
-                if (podiely.get(i) != null)
-                    ps.setInt(4, podiely.get(i));
-                else
-                    ps.setNull(4, Types.INTEGER);
+    public void insertIntoAutorZaznamPracovisko(Integer autor_id, Integer dielo_id, Integer pracovisko_id, Integer percentualny_podiel){
+        String query = "insert into autor_zaznam_pracovisko (autor_id, dielo_id, pracovisko_id, percentualny_podiel) values (?,?,?,?)";
+        try {
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, autor_id);
+            ps.setInt(2, dielo_id);
+            ps.setInt(3, pracovisko_id);
+            if (percentualny_podiel != null)
+                ps.setInt(4, percentualny_podiel);
+            else
+                ps.setNull(4, Types.INTEGER);
 
-                ps.executeUpdate();
-                ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
         }
     }
 
     public void insertIntoOhlas(){
-        String query = "insert into ohlasy (ohlas_id, nazov, zaznam_id) values (?,?,?)";
+        String query = "insert into ohlasy (ohlas_id, nazov, dielo_id) values (?,?,?)";
         for (Ohlas ohlas : ohlasy) {
             try {
                 PreparedStatement ps = con.prepareStatement(query);
                 ps.setInt(1, ohlas.getId());
                 ps.setString(2, ohlas.getNazov());
-                ps.setInt(3, zaznam.getId());
+                ps.setInt(3, dielo.getId());
 
                 ps.executeUpdate();
                 ps.close();
             } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e){
                 e.printStackTrace();
             }
         }

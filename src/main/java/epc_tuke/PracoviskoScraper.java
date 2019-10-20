@@ -1,10 +1,8 @@
 package epc_tuke;
 
-import com.sun.xml.internal.ws.util.StringUtils;
 import epc_tuke.tabulky.Autor;
-import epc_tuke.tabulky.Kategoria;
+import epc_tuke.tabulky.Dielo;
 import epc_tuke.tabulky.Ohlas;
-import epc_tuke.tabulky.Zaznam;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -12,7 +10,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,7 +76,7 @@ public class PracoviskoScraper{
         }
     }
 
-    //Vytiahne vsetky zaznamy na jednej strane okrem prveho //TODO a posledneho
+    //Vytiahne vsetky zaznamy na jednej strane okrem prveho
     public void scrape(){
         if (pracoviskoValue == null || strediskoValue == null) {
             System.err.println("Najprv treba zavolat init() s parametrami.");
@@ -97,73 +94,82 @@ public class PracoviskoScraper{
 
     private void exctractDataFromTableRow(WebElement riadokTabulky){
         Matcher m;
-        Zaznam zaznam = new Zaznam();
-        zaznam.setArchivacne_cislo(riadokTabulky.findElement(By.xpath("td[2]/span")).getText());
-        zaznam.setRok_vydania(Integer.parseInt(riadokTabulky.findElement(By.xpath("td[4]/span")).getText()));
-        zaznam.setNazov(riadokTabulky.findElement(By.xpath("td[5]/p/b/span")).getText());
-        zaznam.setPodnazov(riadokTabulky.findElement(By.xpath("td[5]/p/span[1]")).getText().replaceFirst("/$", "")); //replace kvoli vymazaniu lomitka na konci
+        Dielo dielo = new Dielo();
+        dielo.setArchivacne_cislo(riadokTabulky.findElement(By.xpath("td[2]/span")).getText());
+        dielo.setRok_vydania(Integer.parseInt(riadokTabulky.findElement(By.xpath("td[4]/span")).getText()));
+        dielo.setNazov(riadokTabulky.findElement(By.xpath("td[5]/p/b/span")).getText());
+        dielo.setPodnazov(riadokTabulky.findElement(By.xpath("td[5]/p/span[1]")).getText().replaceFirst("/$", "")); //replace kvoli vymazaniu lomitka na konci
         String odkaz = riadokTabulky.findElement(By.xpath("td[5]/p/a[1]")).getAttribute("href");
-        if (odkaz != null)
-            zaznam.setOdkaz(odkaz);
+        dielo.setOdkaz(odkaz);
 
-        String ostatne = riadokTabulky.findElement(By.xpath("td[5]/p/span[3]")).getText(); //TODO: rozdelit pomocou regexu
-        Pattern ISBNP = Pattern.compile("ISBN:? ([\\-0-9]+)");
+        String ostatne = riadokTabulky.findElement(By.xpath("td[5]/p")).getText();
+        //V zaznamoch, kde su hypertextove odkazy, je len rok medzi spanmi a ostatne informacie su za spanom a pred <a
+        ostatne = ostatne.replaceAll("\n", " ");
+        ostatne = ostatne.replaceAll(" {2,}", " ");
+        int i1 = ostatne.indexOf("ZPokrBezUZ")+12;
+        int i2 = ostatne.indexOf("<a");
+        ostatne = ostatne.substring(i1, i2);
+        String[] ostatneArray = ostatne.split("</span>"); //rozdelenie stringu
+        if (ostatneArray[0].length() > ostatneArray[1].length()){ //ak nema string ziadny text za </span>
+            ostatne = ostatneArray[0];
+        } else { //ak ma string nejaky text za </span>
+            ostatne = ostatneArray[1];
+            ostatne = ostatne.replaceAll(" *Spôsob prístupu: *", "");
+        }
+        ostatne = ostatne.replaceAll("^ +| +$", ""); //odstranenie medzier na zaciatku a na konci
+
+        Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+)");
         m = ISBNP.matcher(ostatne);
         if (m.find()) {
             String ISBN = m.group(1);
-            zaznam.setISBN(ISBN);
+            dielo.setISBN(ISBN);
         }
         ostatne = m.replaceAll("");
 
-        Pattern ISSNP = Pattern.compile("ISSN:? ([0-9]{4}-[0-9]{3}[0-9xX])");
+        Pattern ISSNP = Pattern.compile("ISSN:? ?([0-9]{4}-[0-9]{3}[0-9xX])");
         m = ISSNP.matcher(ostatne);
         if (m.find()) {
             String ISSN = m.group(1);
-            zaznam.setISSN(ISSN);
+            dielo.setISSN(ISSN);
         }
         ostatne = m.replaceAll("");
 
-        Pattern strana_odP = Pattern.compile("[PSps]. ([0-9]+)");
-        m = strana_odP.matcher(ostatne);
+        Pattern stranyP = Pattern.compile("[PSps]\\. ?[0-9]+(-[0-9]+)?"); //najprv sa najde tento vyraz kvoli pripadu ked rok nie je oddeleny nicim okrem medzery (2016 S. 109-114)
+        m = stranyP.matcher(ostatne);
         if (m.find()) {
-            String strana_od = m.group(1);
-            zaznam.setStrana_od(Integer.parseInt(strana_od));
-        }else{
-            strana_odP = Pattern.compile("([0-9]+) [PSps]\\.+");
-            m = strana_odP.matcher(ostatne);
+            String strany = m.group(0);
+            dielo.setStrany(strany);
+        } else { //ak sa nenajde ten prvy vzor, tak hlada dalsi vzor
+            stranyP = Pattern.compile("[0-9]+(-[0-9]+)? [PSps]\\.");
+            m = stranyP.matcher(ostatne);
             if (m.find()) {
-                String strana_od = m.group(1);
-                zaznam.setStrana_od(Integer.parseInt(strana_od));
+                String strany = m.group(0);
+                dielo.setStrany(strany);
             }
         }
         ostatne = m.replaceAll("");
 
-        Pattern strana_doP = Pattern.compile("[PSps]. [0-9]+-([0-9]+)");
-        m = strana_doP.matcher(ostatne);
+        Pattern vydanieP = Pattern.compile("- ?(\\[?[0-9]\\.[^-,]+vyd\\.?\\]? ?[^-]*)-");
+        m = vydanieP.matcher(ostatne);
         if (m.find()) {
-            String strana_do = m.group(1);
-            zaznam.setStrana_do(Integer.parseInt(strana_do));
+            String vydanie = m.group(1);
+            dielo.setVydanie(vydanie);
         }
         ostatne = m.replaceAll("");
-
-        //TODO vydanie ("- [0-9]\\. .+ vyd\\.? ?-")
 
         //k - Košice : TU, FBERG - 2001
 //        Pattern miesto_vydaniaP = Pattern.compile("- [A-Z][^:\n]+ : [a-zA-Z ,]+(, -| -)");
 //        m = miesto_vydaniaP.matcher(ostatne);
 //        if (m.find()) {
 //            String miesto_vydania = m.group(0);
-//            zaznam.setMiesto_vydania(miesto_vydania);
+//            dielo.setMiesto_vydania(miesto_vydania);
 //        }
 //        ostatne = m.replaceAll("");
 
         String autoryNespracovane = riadokTabulky.findElement(By.xpath("td[5]/p/span[4]")).getText();
-        String[] autoryRozdelene = autoryNespracovane.split(" - ");
-
         //odstranenie hranatych zatvoriek na zaciatku a na konci
-        autoryRozdelene[0] = autoryRozdelene[0].substring(1);
-        StringBuilder sb = new StringBuilder(autoryRozdelene[autoryRozdelene.length-1]);
-        autoryRozdelene[autoryRozdelene.length-1] = String.valueOf(sb.deleteCharAt(autoryRozdelene[autoryRozdelene.length-1].length()-1));
+        autoryNespracovane = autoryNespracovane.replaceAll("\\[|\\]", "");
+        String[] autoryRozdelene = autoryNespracovane.split(" - ");
 
         Pattern podielP = Pattern.compile("[0-9]{1,3}");
         Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
@@ -185,41 +191,32 @@ public class PracoviskoScraper{
             try {
                 autor.setPriezvisko(priezviskoAMeno[0]);
                 autor.setMeno(priezviskoAMeno[1]);
-            }catch (ArrayIndexOutOfBoundsException e){
-                for (String s : priezviskoAMeno) {
-                    System.out.println(s); //TODO: Stava sa to pri mene Phan Huy Nam. Nie je ciarka medzi menom a priezviskom. Osetrit.
-                }
+            }catch (ArrayIndexOutOfBoundsException e){ //TODO: Stava sa to pri mene Phan Huy Nam. Nie je ciarka medzi menom a priezviskom. Osetrit.
+                System.out.println(priezviskoAMeno[0]);
             }
             autori.add(autor);
         }
 
-        Pattern ohlasP = Pattern.compile("<br> <br>(.+)(<br> <br>|\n)", Pattern.DOTALL);
+        Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
         m = ohlasP.matcher(riadokTabulky.findElement(By.xpath("td[5]/p")).getAttribute("innerHTML"));
 
+        List<String> ohlasyNespracovane = new ArrayList<String>();
         ArrayList<Ohlas> ohlasy = new ArrayList<Ohlas>();
-        if(m.find()) {
-            String s = m.group(0);
-            String[] ohlasyNespracovane = s.split("<br> <br>");
-            List<String> ohlasyList = Arrays.asList(ohlasyNespracovane);
-            ohlasyList = new ArrayList<String>(ohlasyList);
-            //po splite bude prvy riadok len \n
-            ohlasyList.remove(0);
-
-            for (String ohlasCely : ohlasyList) {
-                Ohlas ohlas = new Ohlas();
-                //TODO Zparsovat ohlas. Zatial sa dava cely do nazvu.
-                ohlas.setNazov(ohlasCely);
-
-                ohlasy.add(ohlas);
-            }
-        } else {
-            System.out.println("Zaznam nema ziadne ohlasy.");
+        while (m.find()){
+            Ohlas ohlas = new Ohlas();
+            ohlas.setRok_vydania(Integer.parseInt(m.group(1)));
+            ohlas.setKategoria_ohlasu_id(Integer.parseInt(m.group(2)));
         }
 
-        Inserter inserter = new Inserter(zaznam, autori, podiely, ohlasy);
-        inserter.insertIntoZaznam();
-        inserter.insertIntoAutor();
-        inserter.insertIntoOhlas();
+
+        for (String ohlasCely : ohlasyNespracovane) {
+            Ohlas ohlas = new Ohlas();
+            //TODO Zparsovat ohlas. Zatial sa dava cely do nazvu.
+            ohlas.setNazov(ohlasCely);
+            ohlasy.add(ohlas);
+        }
+
+//        Inserter inserter = new Inserter(dielo, autori, podiely, ohlasy);
     }
 
     private void nextPage() {
