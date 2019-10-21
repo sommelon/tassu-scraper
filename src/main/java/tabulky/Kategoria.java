@@ -1,24 +1,9 @@
-package epc_tuke.tabulky;
+package tabulky;
 
 public class Kategoria {
-    private static int counter;
-    private int id;
     private String kod = "";
     private String popis = "";
     private int skupina_id;
-
-    public Kategoria() {
-        id = counter;
-        counter++;
-    }
-
-    public int getCounter() {
-        return counter;
-    }
-
-    public int getId() {
-        return id;
-    }
 
     public String getKod() {
         return kod;

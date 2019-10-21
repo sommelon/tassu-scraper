@@ -30,20 +30,20 @@ public class Tests {
 
         String ostatne = "<p style=\"font-size: 11px\">\n" +
                 "                                <b>\n" +
-                "                                    <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_lZNazov\">Uskladňovanie tekutých odpadov v horninových štruktúrach</span></b>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_LZNazovP\">/</span>\n" +
+                "                                    <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl12_lZNazov\">Fractional order systems</span></b>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl12_LZNazovP\">Modeling and Control Applications : World Scientific Series on Nonlinear Science, Series A - Vol. 72/</span>\n" +
                 "                                \n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_lUdajZodpovednosti\">Daniela Marasová ... [et al.]</span>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_lZPokrBezUZ\"> - [1. vyd.] - Košice : TU, FBERG, - 1997. - 114 s. - ISBN 80-88896-11-8.</span>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl12_lUdajZodpovednosti\">Riccardo Caponetto ... [et al.]</span>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl12_lZPokrBezUZ\"> - Singapore : World Scientific Publishing - 2010. - 178 p. - ISBN 978-981-4304-19-1.</span>\n" +
                 "                                \n" +
                 "                                  \n" +
                 "                               \n" +
                 "                                      \n" +
-                "                                   <a id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_HyperLink1\" target=\"_blank\"></a>\n" +
+                "                                   Spôsob prístupu: <a id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl12_HyperLink1\" href=\"http://www.worldscibooks.com/chaos/7709.html\" target=\"_blank\">http://www.worldscibooks.com/chaos/7709.html...</a>\n" +
                 "                                \n" +
                 "                                \n" +
                 "                                <br>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl19_lAut\">[MARASOVÁ, Daniela (25%) - PINKA, Ján (25%) - BUJOK, Petr (25%) - KRIŠTÍN, Štefan (25%)]</span>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl12_lAut\">[CAPONETTO, Riccardo (33%) - DONGOLA, Giovanni (17%) - FORTUNA, Luigi (17%) - PETRÁŠ, Ivo (33%)]</span>\n" +
                 "                                \n" +
                 "                            </p>";
 
@@ -80,6 +80,13 @@ public class Tests {
         }
         ostatne = m.replaceAll("");
 
+        Pattern p = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( | -|\n)");
+        m = p.matcher(ostatne);
+        if (m.find()) {
+            System.out.println(m.group(0));
+            ostatne = m.replaceAll("");
+        }
+
         Pattern stranyP = Pattern.compile("[PSps]\\. ?[0-9]+(-[0-9]+)?"); //najprv sa najde tento vyraz kvoli pripadu ked rok nie je oddeleny nicim okrem medzery (2016 S. 109-114)
         m = stranyP.matcher(ostatne);
         if (m.find()) {
@@ -102,20 +109,18 @@ public class Tests {
             System.out.println(vydanie);
         }
         ostatne = m.replaceAll("");
-//        ostatne = ostatne.replaceAll("[. \\-,]{2,}", " ").trim();
-        System.out.println(ostatne);
 
-//        String[] ohlasyNespracovane = ostatne.split("<br> <br> ");
-//        List<String> ohlasyList = Arrays.asList(ohlasyNespracovane);
-//        List<String> ohlasyList = new ArrayList<String>();
-//
-//        Pattern ohlasyP = Pattern.compile("[0-9]{4}  ?\\[[0-9]{1,2}\\][^<]+");
-//        m = ohlasyP.matcher(ostatne);
-//        while (m.find()){
-//            ohlasyList.add(m.group(0).trim());
-//        }
-//        for (String s1 : ohlasyList) {
-//            System.out.println("s = '" + s1 + "'");
-//        }
+        ostatne = ostatne.replaceAll("^[.\\-, ]{2,}|[.\\-, ]{2,}$", "");
+
+        Pattern miesto_vydaniaP = Pattern.compile("- [A-Z][^:\n]+ : [a-zA-Z ,]+(, -| -)");
+        m = miesto_vydaniaP.matcher(ostatne);
+        if (m.find()) {
+            String miesto_vydania = m.group(0);
+            System.out.println(miesto_vydania);
+        }
+        ostatne = m.replaceAll("");
+
+
+        System.out.println(ostatne);
     }
 }

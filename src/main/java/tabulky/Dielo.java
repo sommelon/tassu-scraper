@@ -1,8 +1,6 @@
-package epc_tuke.tabulky;
+package tabulky;
 
 public class Dielo {
-    private static int counter;
-    private int id;
     private String archivacne_cislo = "";
     private Integer rok_vydania = null;
     private String nazov = "";
@@ -14,19 +12,7 @@ public class Dielo {
     private String klucove_slova = "";
     private String odkaz = "";
     private String strany = "";
-
-    public Dielo() {
-        id = counter;
-        counter++;
-    }
-
-    public static int getCounter() {
-        return counter;
-    }
-
-    public int getId() {
-        return id;
-    }
+    private String priloha = "";
 
     public String getArchivacne_cislo() {
         return archivacne_cislo;
@@ -114,5 +100,13 @@ public class Dielo {
 
     public void setStrany(String strany) {
         this.strany = strany;
+    }
+
+    public String getPriloha() {
+        return priloha;
+    }
+
+    public void setPriloha(String priloha) {
+        this.priloha = priloha;
     }
 }

@@ -1,8 +1,6 @@
-package epc_tuke.tabulky;
+package tabulky;
 
 public class Ohlas {
-    private static int counter;
-    private int id;
     private Integer rok_vydania = null;
     private String nazov = "";
     private String zbierka = "";
@@ -12,19 +10,6 @@ public class Ohlas {
     private String miesto_vydania = "";
     private int dielo_id;
     private int kategoria_ohlasu_id;
-
-    public Ohlas() {
-        id = counter;
-        counter++;
-    }
-
-    public static int getCounter() {
-        return counter;
-    }
-
-    public int getId() {
-        return id;
-    }
 
     public Integer getRok_vydania() {
         return rok_vydania;

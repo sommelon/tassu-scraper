@@ -1,17 +1,7 @@
 package epc_tuke;
 
-import epc_tuke.tabulky.Pracovisko;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import epc_tuke.Inserter;
+import epc_tuke.ZaznamyScraper;
 
 public class Main {
 
@@ -63,25 +53,25 @@ public class Main {
 
         //spustenie scrapera pre vsetky strediska
 //        for (String stredisko : strediskaFBERGValues) {
-//            PracoviskoScraper pracoviskoScraper = new PracoviskoScraper();
-//            pracoviskoScraper.init("01", stredisko);
-//            pracoviskoScraper.scrape();
-//            pracoviskoScraper.getDriver().quit();
-//            zaznamy.put(stredisko, pracoviskoScraper.getData());
+//            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+//            zaznamyScraper.vybratPracovisko("01", stredisko);
+//            zaznamyScraper.scrape();
+//            zaznamyScraper.getDriver().quit();
+//            zaznamy.put(stredisko, zaznamyScraper.getData());
 //        }
 
 //        for (String stredisko : strediskaLFValues) {
-//            PracoviskoScraper pracoviskoScraper = new PracoviskoScraper();
-//            pracoviskoScraper.init("09", stredisko);
-//            pracoviskoScraper.scrape();
-//            pracoviskoScraper.getDriver().quit();
-//            zaznamy.put(stredisko, pracoviskoScraper.getData());
+//            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+//            zaznamyScraper.vybratPracovisko("09", stredisko);
+//            zaznamyScraper.scrape();
+//            zaznamyScraper.getDriver().quit();
+//            zaznamy.put(stredisko, zaznamyScraper.getData());
 //        }
 
-        PracoviskoScraper pracoviskoScraper = new PracoviskoScraper();
-        pracoviskoScraper.init("01", "101001");
-        pracoviskoScraper.scrape();
+        ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+        zaznamyScraper.vybratPracovisko("01", "Celá fakulta");
+        zaznamyScraper.scrape();
 
-        Inserter.closeConnection();
+//        Inserter.closeConnection();
     }
 }

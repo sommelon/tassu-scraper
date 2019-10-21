@@ -1,23 +1,8 @@
-package epc_tuke.tabulky;
+package tabulky;
 
 public class Pracovisko {
-    private static int counter;
-    private int id;
     private String nazov = "";
     private int fakulta_id;
-
-    public Pracovisko() {
-        id = counter;
-        counter++;
-    }
-
-    public static int getCounter() {
-        return counter;
-    }
-
-    public int getId() {
-        return id;
-    }
 
     public String getNazov() {
         return nazov;
