@@ -64,7 +64,7 @@ public class Tests {
         }
         ostatne = ostatne.replaceAll("^ +| +$", ""); //odstranenie medzier na zaciatku a na konci
 
-        Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+)");
+        Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+X?)");
         m = ISBNP.matcher(ostatne);
         if (m.find()) {
             String ISBN = m.group(1);
@@ -110,6 +110,9 @@ public class Tests {
         }
         ostatne = m.replaceAll("");
 
+        Pattern rokP = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( -| |\n)");
+        m = rokP.matcher(ostatne);
+        ostatne = m.replaceAll("");
         ostatne = ostatne.replaceAll("^[.\\-, ]{2,}|[.\\-, ]{2,}$", "");
 
         Pattern miesto_vydaniaP = Pattern.compile("- [A-Z][^:\n]+ : [a-zA-Z ,]+(, -| -)");
@@ -119,8 +122,6 @@ public class Tests {
             System.out.println(miesto_vydania);
         }
         ostatne = m.replaceAll("");
-
-
         System.out.println(ostatne);
     }
 }
