@@ -69,7 +69,7 @@ public class Main {
 //        }
 
         ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-        zaznamyScraper.vybratPracovisko("01", "101001");
+        zaznamyScraper.vybratPracovisko("01", "Celá fakulta");
         zaznamyScraper.scrape();
 
 //        Inserter.closeConnection();
