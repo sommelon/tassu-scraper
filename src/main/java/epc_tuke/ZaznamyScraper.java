@@ -21,14 +21,21 @@ public class ZaznamyScraper {
     private String strediskoValue;
     private int currentPage = 0;
 
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+
     private Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+X?)");
     private Pattern ISSNP = Pattern.compile("ISSN:? ?([0-9]{4}-[0-9]{3}[0-9xX])");
 //    private Pattern rokP = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( -| |\n)");
     private Pattern rok1P = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
     private Pattern rokNaKonciP = Pattern.compile("[,\\-]? \\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
-    private Pattern strany1P = Pattern.compile("(\\[[^\\]]+\\] )?[PSps]\\.? ?[0-9]+(-[0-9]+)?( \\[[^\\]]+\\])?"); //strany aj s poznamkou v hranatych zatvorkach
-    private Pattern strany2P = Pattern.compile("(\\[[^\\]]+\\] )?[0-9]+(-[0-9]+)? [PSps]\\.?( \\[[^\\]]+\\])?");
-    private Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.[^-,]+vyd\\.?\\]? ?[^-]*)-");
+    private Pattern stranyNeuvedeneP = Pattern.compile("([SPsp]\\.? neuved[^ \\-\n]?)|(neuved[^ \\-\n]? [SPsp]\\.?)");
+    private Pattern strany1P = Pattern.compile("(\\[[^\\]]+\\] )?[PSps]\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])( \\[[^\\]]+\\])*"); //strany aj s poznamkou v hranatych zatvorkach
+    private Pattern strany2P = Pattern.compile("(\\[[^\\]]+\\] )?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?( \\[[^\\]]+\\])*");// 86 p [CD-ROM]; [86] p; 86 p
+    private Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? ?[^-]*)-");
     private Pattern podielP = Pattern.compile("[0-9]{1,3}");
     private Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
     private Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
@@ -42,7 +49,7 @@ public class ZaznamyScraper {
         options.addArguments("disable-infobars");
 
         driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, 15);
+        wait = new WebDriverWait(driver, 30);
     }
 
     //Inicializacia - Nacita stranku, vyhlada konkretnu fakultu a pracovisko a pocka, kym sa nacitaju vysledky.
@@ -146,10 +153,10 @@ public class ZaznamyScraper {
         if (ostatneArray[1].length() <= " Spôsob prístupu: ".length()){ //ked je za </span> len text " Spôsob prístupu: " alebo nejaky kratsi text, tak je to nepodstatne
             ostatne = ostatneArray[0];
         } else { //Ak je za </span> dlhsi text ako " Spôsob prístupu: ", su tam podstatne informacie
-            if (ostatneArray[0].length() > 10) { //ak je pred </span> text dlhsi ako 10 pismen, je tam aj priloha
+            if (ostatneArray.length == 2 && ostatneArray[0].length() > 10) { //ak je pred </span> text dlhsi ako 10 pismen, je tam aj priloha
                 ostatneArray[0] = rok1P.matcher(ostatneArray[0]).replaceAll(""); //odstrani sa rok a mala by ostat iba priloha
                 ostatneArray[0] = znakyNaStranachP.matcher(ostatneArray[0]).replaceAll("");
-                System.out.println("\tPriloha: " + ostatneArray[0]);
+                System.out.println(ANSI_YELLOW+ "Priloha: " + ostatneArray[0] +ANSI_RESET);
                 dielo.setPriloha(ostatneArray[0]);
             }
             ostatne = ostatneArray[1];
@@ -170,22 +177,23 @@ public class ZaznamyScraper {
             ostatne = m.replaceAll("");
         }
 
-        m = strany1P.matcher(ostatne); //najprv sa najde vyraz strany1P kvoli pripadu ked rok nie je oddeleny nicim (okrem medzery) (2016 S. 109-114)
-        if (m.find()) {
-            dielo.setStrany(m.group(0));
-            ostatne = m.replaceAll("");
-        }else{ //ak podla prveho vyrazu nic nenajde, skusi druhy vyraz
-            m = strany2P.matcher(ostatne);
+        m = stranyNeuvedeneP.matcher(ostatne);
+        if (!m.find()) { //ak nenajde nejaku variaciu p neuved tak bude kontrolovat ostatne normalne
+            m = strany1P.matcher(ostatne); //najprv sa najde vyraz strany1P kvoli pripadu ked rok nie je oddeleny nicim (okrem medzery) (2016 S. 109-114)
             if (m.find()) {
                 dielo.setStrany(m.group(0));
-                ostatne = m.replaceAll("");
+            } else { //ak podla prveho vyrazu nic nenajde, skusi druhy vyraz
+                m = strany2P.matcher(ostatne);
+                if (m.find()) {
+                    dielo.setStrany(m.group(0));
+                }
             }
         }
+        ostatne = m.replaceAll("");
 
         m = vydanieP.matcher(ostatne);
         if (m.find()) {
-            dielo.setVydanie(m.group(2).trim());
-            System.out.println("\t\t\t"+m.group(2).trim());
+            dielo.setVydanie(m.group(2).replaceAll("\\[|\\]", ""));
             ostatne = m.replaceAll("");
         }
 
