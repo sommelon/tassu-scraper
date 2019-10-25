@@ -1,8 +1,8 @@
 package tabulky;
 
 public class Skupina {
-    private String kod = "";
-    private String popis = "";
+    private String kod = null;
+    private String popis = null;
 
     public String getKod() {
         return kod;

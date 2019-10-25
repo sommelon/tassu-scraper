@@ -68,10 +68,12 @@ public class Main {
 //            zaznamy.put(stredisko, zaznamyScraper.getData());
 //        }
 
-        ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-        zaznamyScraper.vybratPracovisko("01", "Celá fakulta");
-        zaznamyScraper.scrape();
+//        Inserter.openConnection();
 
-//        Inserter.closeConnection();
+        ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+//        zaznamyScraper.vybratPracovisko("01", "101001");
+        zaznamyScraper.vybratPracovisko("01", "Celá fakulta");
+        zaznamyScraper.goToPage(8);
+        zaznamyScraper.scrape();
     }
 }

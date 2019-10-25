@@ -1,8 +1,8 @@
 package tabulky;
 
 public class Autor {
-    private String meno = "";
-    private String priezvisko = "";
+    private String meno = null;
+    private String priezvisko = null;
 
     public String getMeno() {
         return meno;

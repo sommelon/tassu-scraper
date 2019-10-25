@@ -2,12 +2,12 @@ package tabulky;
 
 public class Ohlas {
     private Integer rok_vydania = null;
-    private String nazov = "";
-    private String zbierka = "";
-    private String strany = "";
-    private String ISBN = "";
-    private String ISSN = "";
-    private String miesto_vydania = "";
+    private String nazov = null;
+    private String zbierka = null;
+    private String strany = null;
+    private String ISBN = null;
+    private String ISSN = null;
+    private String miesto_vydania = null;
     private int dielo_id;
     private int kategoria_ohlasu_id;
 

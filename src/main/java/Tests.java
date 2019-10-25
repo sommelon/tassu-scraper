@@ -27,19 +27,22 @@ public class Tests {
 //        for(WebElement e : select.findElements(By.xpath("option"))){
 //            System.out.println(e.getText());
 //        }
+        Pattern cisloP = Pattern.compile("[0-9]+");
+        Pattern optickyDiskP = Pattern.compile("[0-9] elektronick[ýé](ch)? optický(ch)? disk(y|ov)? \\(CD-ROM\\)");
+        Pattern sposobPristupuP = Pattern.compile(" *Spôsob prístupu: *");
         Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+X?)");
         Pattern ISSNP = Pattern.compile("ISSN:? ?([0-9]{4}-[0-9]{3}[0-9xX])");
 //    Pattern rokP = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( -| |\n)");
-        Pattern rok1P = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
-        Pattern rokNaKonciP = Pattern.compile("[,\\-]? \\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
+        Pattern rok1P = Pattern.compile("(- |\\(| )?(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
+        Pattern rokNaKonciP = Pattern.compile("[,\\- ]?\\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
         Pattern stranyNeuvedeneP = Pattern.compile("([SPsp]\\.? neuved[^ \\-\n]?)|(neuved[^ \\-\n]? [SPsp]\\.?)");
         Pattern strany1P = Pattern.compile("(\\[[^\\]]+\\] )?[PSps]\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])( \\[[^\\]]+\\])*"); //strany aj s poznamkou v hranatych zatvorkach
         Pattern strany2P = Pattern.compile("(\\[[^\\]]+\\] )?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?( \\[[^\\]]+\\])*");// 86 p [CD-ROM]; [86] p; 86 p
-        Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.[^-,]+vyd\\.?\\]? ?[^-]*)-");
+        Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? ?[^-]*)-");
         Pattern podielP = Pattern.compile("[0-9]{1,3}");
         Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
         Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
-        Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$");
+        Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$|\\[\\]");
 
         //TODO - Košice : TU-FBERG - 2000. - 78, [2] s.. - ISBN 80-7099-634-X. WATAFAK????????????????????
 
@@ -47,46 +50,57 @@ public class Tests {
         //	Priloha: Rijeka : InTech  264 p.. - ISBN 9789533075020
         String ostatne = "<p style=\"font-size: 11px\">\n" +
                 "                                <b>\n" +
-                "                                    <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl27_lZNazov\">Ochrana ovzduší</span></b>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl27_LZNazovP\">/</span>\n" +
+                "                                    <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_lZNazov\">TeZEK - Technológie znalostnej ekonomiky</span></b>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_LZNazovP\">/</span>\n" +
                 "                                \n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl27_lUdajZodpovednosti\">Jozef Mačala, Vladimír Smrž</span>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl27_lZPokrBezUZ\"> - 2006.</span>\n" +
-                "                                In: Environmentální vzdělávání. - Ostrava : VŠB-TU, 2006 P. 229-283. - ISBN 8024811138 \n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_lUdajZodpovednosti\">Jozef Bucko ... [et al.]</span>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_lZPokrBezUZ\"> - Košice : TU, - 2005. - 1 elektronický optický disk (CD-ROM). - ISBN 80-8073-319-8.</span>\n" +
+                "                                \n" +
                 "                                  \n" +
                 "                               \n" +
                 "                                      \n" +
-                "                                   <a id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl27_HyperLink1\" target=\"_blank\"></a>\n" +
+                "                                   <a id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_HyperLink1\" target=\"_blank\"></a>\n" +
                 "                                \n" +
                 "                                \n" +
                 "                                <br>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl27_lAut\">[MAČALA, Jozef - SMRŽ, Vladimír]</span>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_lAut\">[BUCKO, Jozef - DELINA, Radoslav - GROHOĽ, Milan - HOROVČÁK, Pavel - LAVRIN, Anton - LEVICKÝ, Dušan - MIHÓK, Peter - ŠEVEC, Sergej - VODZINSKÝ, Vladimír - GRAJCÁROVÁ, Ľ. - ČIŽMÁRIKOVÁ, K. - ČIŽMÁRIK, M.]</span>\n" +
                 "                                \n" +
                 "                            </p>";
 
 
         Matcher m;
 
-        ostatne = ostatne.replaceAll("\n", " "); //TODO vsetky replaceAll na Stringoch sa daju zrychlit keby sa regex skompiloval pri instanciacii a zavolal replaceAll na matcheri namiesto Stringu
+        ostatne = ostatne.replaceAll("\n", " ");
         ostatne = ostatne.replaceAll(" {2,}", " ");
         int i1 = ostatne.indexOf("ZPokrBezUZ")+12;
         int i2 = ostatne.indexOf("<a");
         ostatne = ostatne.substring(i1, i2);
-        String[] ostatneArray = ostatne.split("</span>");
-        if (ostatneArray[1].length() <= " Spôsob prístupu: ".length()){ //ked je za </span> len text " Spôsob prístupu: " alebo nejaky kratsi text, tak je to nepodstatne
-            ostatne = ostatneArray[0];
-        } else { //Ak je za </span> dlhsi text ako " Spôsob prístupu: ", su tam podstatne informacie
-            if (ostatneArray.length == 2 && ostatneArray[0].length() > 10) { //ak je pred </span> text dlhsi ako 10 pismen, je tam aj priloha
-                ostatneArray[0] = rok1P.matcher(ostatneArray[0]).replaceAll(""); //odstrani sa rok a mala by ostat iba priloha
-                ostatneArray[0] = znakyNaStranachP.matcher(ostatneArray[0]).replaceAll("");
-                System.out.println("\tPriloha: " + ostatneArray[0]);
-//                dielo.setPriloha(ostatneArray[0]);
-            }
-            ostatne = ostatneArray[1];
-            ostatne = ostatne.replaceAll(" *Spôsob prístupu: *", "");
+        ostatne = sposobPristupuP.matcher(ostatne).replaceAll("");
+
+        m = optickyDiskP.matcher(ostatne);
+        if (m.find()) {
+//            dielo.setPriloha(m.group(0));
+            ostatne = m.replaceAll("");
         }
-        m = znakyNaStranachP.matcher(ostatne);
-        ostatne = m.replaceAll(""); //odstranenie medzier na zaciatku a na konci
+
+        String[] ostatneArray = ostatne.split("</span>");
+        if (ostatneArray.length == 2) {
+            if (ostatneArray[1].length() <= 2) { //ked je za </span> nic nie je, pracujeme iba s castou pred </span> (cislo 2 je tam keby nahodou bolo za spanom napr. "2 s")
+                ostatne = ostatneArray[0];
+            } else {
+                if (ostatneArray[0].length() > 10) { //ak je pred </span> text dlhsi ako 10 pismen
+                    //je pripad kedy tu priloha nie je, ale su tu tie iste informacie ako za </span>
+                    ostatneArray[0] = rok1P.matcher(ostatneArray[0]).replaceAll(""); //rok1P pattern vymaze aj pomlcky okolo roku
+//                ostatneArray[0] = znakyNaStranachP.matcher(ostatneArray[0]).replaceAll("");
+                    System.out.println("ostatneArray[0]: "+ ostatneArray[0]);
+                }
+                ostatne = ostatneArray[1];
+                System.out.println("ostatneArray[1]: "+ ostatneArray[1]);
+            }
+        } else {
+            ostatne = ostatneArray[0];
+        }
+        ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
 
         m = ISBNP.matcher(ostatne);
         if (m.find()) {
@@ -101,16 +115,14 @@ public class Tests {
         }
 
         m = stranyNeuvedeneP.matcher(ostatne);
-        if (!m.find()) {
+        if (!m.find()) { //ak nenajde nejaku variaciu p neuved tak bude kontrolovat ostatne normalne
             m = strany1P.matcher(ostatne); //najprv sa najde vyraz strany1P kvoli pripadu ked rok nie je oddeleny nicim (okrem medzery) (2016 S. 109-114)
             if (m.find()) {
 //                dielo.setStrany(m.group(0));
-                System.out.println("Naslo sa "+m.group(0));
             } else { //ak podla prveho vyrazu nic nenajde, skusi druhy vyraz
                 m = strany2P.matcher(ostatne);
                 if (m.find()) {
 //                    dielo.setStrany(m.group(0));
-                    System.out.println("Naslo sa "+m.group(0));
                 }
             }
         }
@@ -119,29 +131,26 @@ public class Tests {
         m = vydanieP.matcher(ostatne);
         if (m.find()) {
 //            dielo.setVydanie(m.group(2).replaceAll("\\[|\\]", ""));
-//            System.out.println("\t\t\t"+dielo.getVydanie());
             ostatne = m.replaceAll("");
         }
 
-        ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
-        ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
-        Pattern miesto_vydania1P = Pattern.compile("In:(- )?[A-Z][^:\n]+: [a-zA-Z ,]+(, -| -)");
-        m = miesto_vydania1P.matcher(ostatne);
-        if (m.find()) {
-            String miesto_vydania = m.group(0);
+//        Pattern miesto_vydania1P = Pattern.compile("In:(- )?[A-Z][^:\n]+: [a-zA-Z ,]+(, -| -)");
+//        m = miesto_vydania1P.matcher(ostatne);
+//        if (m.find()) {
+//            String miesto_vydania = m.group(0);
 //            dielo.setMiesto_vydania(miesto_vydania);
-            ostatne = m.replaceAll("");
-        }
-        ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
-        System.out.println(ostatne);
+//            ostatne = m.replaceAll("");
+//        }
 
-        Pattern miesto_vydaniaP = Pattern.compile("- [A-Z][^:\n]+ : [a-zA-Z ,]+(, -| -)");
-        m = miesto_vydaniaP.matcher(ostatne);
-        if (m.find()) {
-            String miesto_vydania = m.group(0);
-            System.out.println(miesto_vydania);
+        //TODO zacykluje sa
+        m = znakyNaStranachP.matcher(ostatne);
+        while (m.find()) {
+            ostatne = m.replaceAll("");
+            ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
+            m = znakyNaStranachP.matcher(ostatne);
         }
-        ostatne = m.replaceAll("");
+
+//        dielo.setMiesto_vydania(ostatne);
         System.out.println(ostatne);
     }
 }

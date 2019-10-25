@@ -1,4 +1,5 @@
 package epc_tuke;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import tabulky.Autor;
 import tabulky.Dielo;
 import tabulky.Ohlas;
@@ -17,9 +18,7 @@ public class ZaznamyScraper {
     private ChromeOptions options;
     private WebDriver driver;
     private WebDriverWait wait;
-    private String fakultaValue;
-    private String strediskoValue;
-    private int currentPage = 0;
+    private int currentPage = 1;
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -27,11 +26,15 @@ public class ZaznamyScraper {
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_BLUE = "\u001B[34m";
 
+    private Pattern cisloP = Pattern.compile("[0-9]+");
+    private Pattern optickyDiskP = Pattern.compile("[0-9] elektronick[ýé](ch)? optický(ch)? disk(y|ov)? \\(CD-ROM\\)");
+    private Pattern sposobPristupuP = Pattern.compile(" *Spôsob prístupu: *");
     private Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+X?)");
     private Pattern ISSNP = Pattern.compile("ISSN:? ?([0-9]{4}-[0-9]{3}[0-9xX])");
 //    private Pattern rokP = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( -| |\n)");
-    private Pattern rok1P = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
-    private Pattern rokNaKonciP = Pattern.compile("[,\\-]? \\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
+    private Pattern rok1P = Pattern.compile("(- |\\(| )?(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
+    private Pattern rokNaKonciP = Pattern.compile("[,\\- ]?\\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
+    private Pattern cisloNaKonciP = Pattern.compile("- [\\(\\[]?[0-9][\\)\\]]? *$"); //rok na konci riadku - mal by byt na konci miesta vydania
     private Pattern stranyNeuvedeneP = Pattern.compile("([SPsp]\\.? neuved[^ \\-\n]?)|(neuved[^ \\-\n]? [SPsp]\\.?)");
     private Pattern strany1P = Pattern.compile("(\\[[^\\]]+\\] )?[PSps]\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])( \\[[^\\]]+\\])*"); //strany aj s poznamkou v hranatych zatvorkach
     private Pattern strany2P = Pattern.compile("(\\[[^\\]]+\\] )?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?( \\[[^\\]]+\\])*");// 86 p [CD-ROM]; [86] p; 86 p
@@ -39,7 +42,7 @@ public class ZaznamyScraper {
     private Pattern podielP = Pattern.compile("[0-9]{1,3}");
     private Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
     private Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
-    private Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$");
+    private Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$|\\[\\]");
 
     public ZaznamyScraper() {
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
@@ -54,9 +57,7 @@ public class ZaznamyScraper {
 
     //Inicializacia - Nacita stranku, vyhlada konkretnu fakultu a pracovisko a pocka, kym sa nacitaju vysledky.
     public void vybratPracovisko(String fakultaValue, String strediskoValue){
-        this.fakultaValue = fakultaValue;
-        this.strediskoValue = strediskoValue;
-
+        System.out.println(ANSI_BLUE+ "Fakulta: "+ fakultaValue + ", stredisko: "+ strediskoValue +ANSI_RESET);
         driver.get("https://epc.lib.tuke.sk/PrehladPubl.aspx");
         //kliknutie na tu sipku, ktora otvori dalsie moznosti
         driver.findElement(By.id("ctl00_ContentPlaceHolderMain_Image1")).click();
@@ -97,8 +98,7 @@ public class ZaznamyScraper {
 
     //Vytiahne vsetky zaznamy na jednej strane okrem prveho
     public void scrape(){
-        if (fakultaValue == null || strediskoValue == null) {
-            System.err.println("Najprv treba zavolat init() s parametrami.");
+        if (driver.findElement(By.id("ctl00_ContentPlaceHolderMain_lPocetNajdenychZaznamov")).getText().equals("Počet nájdených záznamov : 0")) {
             return;
         }
 
@@ -112,24 +112,30 @@ public class ZaznamyScraper {
     }
 
     private void nextPage() {
-        WebElement currentPageElement = driver.findElement(
-                By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter\"]/tbody/tr[last()]/td/table/tbody/tr/td/span"));
-        currentPage = Integer.parseInt(currentPageElement.getText());
-        int nextPage = currentPage+1;
-
         try {
-//            WebElement nextPageElement = driver.findElement(By.linkText(Integer.toString(nextPage)));
-            WebElement nextPageElement = currentPageElement.findElement(By.xpath("ancestor::td[1]/following-sibling::td[1]/a"));
-            nextPageElement.click();
-            //pocka sa kym text na XPath adrese bude mat hodnotu dalsej strany
-            wait.until(ExpectedConditions.textToBe(
-                    By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter\"]/tbody/tr[last()]/td/table/tbody/tr/td/span"), Integer.toString(nextPage)));
-
-            System.out.println("Strana " + nextPage);
+            goToPage(currentPage+1);
             scrape();
-        } catch (NoSuchElementException e){
-            System.err.println("Dalsia strana neexistuje.");
+        } catch (NoSuchPageException e){
+            System.out.println(ANSI_RED+ "Strana "+ currentPage +" neexistuje." +ANSI_RESET);
         }
+    }
+
+    public void goToPage(int page){
+        String pocetZaznamov = driver.findElement(By.id("ctl00_ContentPlaceHolderMain_lPocetNajdenychZaznamov")).getText();
+        Matcher m = cisloP.matcher(pocetZaznamov);
+        if(!m.find())
+            throw new IllegalStateException();
+        int maxPages = (int) Math.ceil((double) Integer.parseInt(m.group(0))/30);
+        if (page < 1 || page > maxPages)
+            throw new NoSuchPageException("Strana neexistuje.");
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("__doPostBack('ctl00$ContentPlaceHolderMain$gvVystupyByFilter','Page$"+page+"')");
+        wait.until(ExpectedConditions.textToBe(
+            By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter\"]/tbody/tr[last()]/td/table/tbody/tr/td/span"), Integer.toString(page)));
+
+        currentPage = page;
+        System.out.println(ANSI_BLUE+ "Strana " + currentPage +ANSI_RESET);
     }
 
     private void exctractDataFromTableRow(WebElement riadokTabulky){
@@ -149,21 +155,13 @@ public class ZaznamyScraper {
         int i1 = ostatne.indexOf("ZPokrBezUZ")+12;
         int i2 = ostatne.indexOf("<a");
         ostatne = ostatne.substring(i1, i2);
-        String[] ostatneArray = ostatne.split("</span>");
-        if (ostatneArray[1].length() <= " Spôsob prístupu: ".length()){ //ked je za </span> len text " Spôsob prístupu: " alebo nejaky kratsi text, tak je to nepodstatne
-            ostatne = ostatneArray[0];
-        } else { //Ak je za </span> dlhsi text ako " Spôsob prístupu: ", su tam podstatne informacie
-            if (ostatneArray.length == 2 && ostatneArray[0].length() > 10) { //ak je pred </span> text dlhsi ako 10 pismen, je tam aj priloha
-                ostatneArray[0] = rok1P.matcher(ostatneArray[0]).replaceAll(""); //odstrani sa rok a mala by ostat iba priloha
-                ostatneArray[0] = znakyNaStranachP.matcher(ostatneArray[0]).replaceAll("");
-                System.out.println(ANSI_YELLOW+ "Priloha: " + ostatneArray[0] +ANSI_RESET);
-                dielo.setPriloha(ostatneArray[0]);
-            }
-            ostatne = ostatneArray[1];
-            ostatne = ostatne.replaceAll(" *Spôsob prístupu: *", "");
+        ostatne = sposobPristupuP.matcher(ostatne).replaceAll("");
+
+        m = optickyDiskP.matcher(ostatne);
+        if (m.find()) {
+            dielo.setPriloha(m.group(0));
+            ostatne = m.replaceAll("");
         }
-        m = znakyNaStranachP.matcher(ostatne);
-        ostatne = m.replaceAll(""); //odstranenie medzier na zaciatku a na konci
 
         m = ISBNP.matcher(ostatne);
         if (m.find()) {
@@ -197,17 +195,39 @@ public class ZaznamyScraper {
             ostatne = m.replaceAll("");
         }
 
-        ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
-        ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
-        Pattern miesto_vydania1P = Pattern.compile("In:(- )?[A-Z][^:\n]+: [a-zA-Z ,]+(, -| -)");
-        m = miesto_vydania1P.matcher(ostatne);
-        if (m.find()) {
-            String miesto_vydania = m.group(0);
-            dielo.setMiesto_vydania(miesto_vydania);
-            ostatne = m.replaceAll("");
+        String[] ostatneArray = ostatne.split("</span>");
+        if (ostatneArray.length == 2) {
+            if (ostatneArray[1].length() <= ostatneArray[0].length()) { //ked je za </span> nic nie je, pracujeme iba s castou pred </span> (cislo 2 je tam keby nahodou bolo za spanom napr. "2 s")
+                ostatne = ostatneArray[0];
+            } else {
+                ostatne = ostatneArray[1];
+            }
+            System.out.println(ANSI_YELLOW+ "ostatneArray[0]: "+ ostatneArray[0] +ANSI_RESET);
+            System.out.println(ANSI_YELLOW+ "ostatneArray[1]: "+ ostatneArray[1] +ANSI_RESET);
+        } else {
+            ostatne = ostatneArray[0];
         }
-        ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
+
+//        Pattern miesto_vydania1P = Pattern.compile("In:(- )?[A-Z][^:\n]+: [a-zA-Z ,]+(, -| -)");
+//        m = miesto_vydania1P.matcher(ostatne);
+//        if (m.find()) {
+//            String miesto_vydania = m.group(0);
+//            dielo.setMiesto_vydania(miesto_vydania);
+//            ostatne = m.replaceAll("");
+//        }
+
+        m = znakyNaStranachP.matcher(ostatne);
+        while (m.find()) {
+            ostatne = m.replaceAll("");
+            ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
+            ostatne = cisloNaKonciP.matcher(ostatne).replaceAll("");
+            m = znakyNaStranachP.matcher(ostatne);
+        }
+
+        dielo.setMiesto_vydania(ostatne);
         System.out.println(ostatne);
+        if (dielo.getPriloha() != null)
+            System.out.println(ANSI_YELLOW + "\tPriloha: " + dielo.getPriloha() + ANSI_RESET);
 
         String autoryNespracovane = riadokTabulky.findElement(By.xpath("td[5]/p/span[4]")).getText();
         //odstranenie hranatych zatvoriek na zaciatku a na konci
@@ -288,5 +308,13 @@ public class ZaznamyScraper {
         driver.findElement(By.id("ctl00_ContentPlaceHolderMain_chbAjPercentualnePodiely")).click();
         //klikne na tlacidlo a zacne sa hladat
         driver.findElement(By.id("ctl00_ContentPlaceHolderMain_btnHladaj")).click();
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
     }
 }

@@ -1,7 +1,7 @@
 package tabulky;
 
 public class Pracovisko {
-    private String nazov = "";
+    private String nazov = null;
     private int fakulta_id;
 
     public String getNazov() {

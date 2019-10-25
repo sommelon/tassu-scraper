@@ -9,22 +9,25 @@ public class Inserter {
     private static final String url = "jdbc:mysql://localhost:3306/tassu?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private static final String user  = "root";
     private static final String pass  = "qwer";
-    //todo zistit co je problem s packagom
     private static Connection con = null;
 
-    //TODO prerobit, aby to bolo flexibilnejsie. Cudzie kluce by uz mali byt v objektoch a nemali by sa nastavovat v tychto metodach.
     //ohlasy a podiely mozu byt null
-    public Inserter(){
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    private Inserter(){
+    }
 
-        try {
-            con = DriverManager.getConnection(url, user, pass);
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public static void openConnection() {
+        if (con == null) {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                con = DriverManager.getConnection(url, user, pass);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -83,10 +86,6 @@ public class Inserter {
                 e.printStackTrace();
             }
         }
-        //TODO: close PreparedStatement in a finally block
-//        finally {
-//            ps.close();
-//        }
     }
 
     public static void insertIntoAutorZaznamPracovisko(Integer autor_id, Integer dielo_id, Integer pracovisko_id, Integer percentualny_podiel){

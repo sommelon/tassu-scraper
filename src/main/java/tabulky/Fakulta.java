@@ -1,8 +1,8 @@
 package tabulky;
 
 public class Fakulta {
-    private String nazov = "";
-    private String skratka = "";
+    private String nazov = null;
+    private String skratka = null;
 
     public String getNazov() {
         return nazov;
