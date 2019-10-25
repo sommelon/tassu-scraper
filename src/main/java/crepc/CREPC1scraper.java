@@ -67,20 +67,22 @@ public class CREPC1scraper {
         //*[@id="divChck_2"]/div[2]/text()[2]
         if(driver.findElements(By.xpath("//*[contains(@id, 'divChck')]")).size()>1) {
             String xpath = "//*[contains('" + isbn + "')]";
-            if (driver.findElements(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "')]")).size() > 0) {
-                if (driver.findElement(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "')]")).getText().contains(isbn)) {
-                    WebElement childElement = driver.findElement(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "')]"));
-                    WebElement parent = (WebElement) ((JavascriptExecutor) driver)
-                            .executeScript("return arguments[0].parentNode;", childElement);
-                    String numberOfRecord = parent.getText().substring(0, parent.getText().indexOf("\n"));
-                    driver.findElement(By.xpath("//*[@id=\"divChck_" + numberOfRecord + "\"]/div[3]/a")).click();
-                    //*[@id="divChck_1"]/div[3]/a
-                    //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"divChck_1\"]/div[3]/a")));
-                    keyWordsFull = driver.findElement(By.xpath("//*[@id=\"wrap\"]/div/div[7]/label")).getText();
-                    System.out.println(keyWordsFull);
-                    parseKeywords(keyWordsFull);
-                    insertToDatabase();
+            if (driver.findElements(By.xpath("//div[@class='mid'][contains(.,'" + isbn + "') ]")).size() > 0) {
+                if(driver.findElements(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "') and contains (.,'" + recordName + "')]")).size()>0) {
+                    if (driver.findElement(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "')and contains(.,'" + recordName + "')]")).getText().contains(isbn)) {
+                        WebElement childElement = driver.findElement(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "')]"));
+                        WebElement parent = (WebElement) ((JavascriptExecutor) driver)
+                                .executeScript("return arguments[0].parentNode;", childElement);
+                        String numberOfRecord = parent.getText().substring(0, parent.getText().indexOf("\n"));
+                        driver.findElement(By.xpath("//*[@id=\"divChck_" + numberOfRecord + "\"]/div[3]/a")).click();
+                        //*[@id="divChck_1"]/div[3]/a
+                        //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"divChck_1\"]/div[3]/a")));
+                        keyWordsFull = driver.findElement(By.xpath("//*[@id=\"wrap\"]/div/div[7]/label")).getText();
+                        System.out.println(keyWordsFull);
+                        parseKeywords(keyWordsFull);
+                        insertToDatabase();
 
+                    }
                 }
 
 
