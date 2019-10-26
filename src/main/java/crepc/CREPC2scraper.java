@@ -71,18 +71,19 @@ public class CREPC2scraper {
         if(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).size()>0) {
             if (wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']"))).size() > 0) {
                // ord = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")));
-                elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).size();
+                //elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).size();
+                elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName +  "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap")).size();
                 //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@class='btn btn-default text-wrap']")));
             }
             for (int i = 0; i < elementsSize; i++) {
-                elementsString.add(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).get(i).getText());
+                elementsString.add(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap")).get(i).getText());
             }
             StringBuilder sb = new StringBuilder();
             for (String e : elementsString) {
                 sb.append(e + ", ");
             }
 
-      /*  if(driver.findElements(By.xpath("//a[@class='btn btn-default text-wrap']div[@class='col-sm-12'][contains(.,'" + isbn + "')]")).size()>0) {
+      /*  if(driver.findElements(By.xpath("//a[@class='btn btn-default text-wrap']div[@class='col-sm-12'][contains(.,'" + isbn + "')]")).size()>0) {driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName +  "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap"))
             if (wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']"))).size() > 0) {
                 ord = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']")));
                 elementsSize = ord.size();

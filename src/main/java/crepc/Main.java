@@ -8,11 +8,11 @@ import java.sql.*;
 public class Main {
     public static void main(String[] args) {
        ResultSet resultSet = databaseConnection();
-      CREPC1scraper crepc1scraper = new CREPC1scraper(resultSet);
+   //   CREPC1scraper crepc1scraper = new CREPC1scraper(resultSet);
        CREPC2scraper crepc2scraper = new CREPC2scraper();
 
 
-      //crepc2scraper.searchForRecordKeyword("Open structured databases' use in destination management ", "ISBN 978-90-828093-5-0 ");
+      crepc2scraper.searchForRecordKeyword("Open structured databases' use in destination management ", "ISBN 978-90-828093-5-0 ");
        /* try{
             while (resultSet.next()){
                 crepc2scraper.searchForRecordKeyword(resultSet.getString("nazov"), "");
@@ -23,7 +23,7 @@ public class Main {
             e.printStackTrace();
 
         }*/
-        try {
+      /*  try {
             assert resultSet != null;
             while (resultSet.next()) {
                 System.out.println("Doing: " + resultSet.getRow());
@@ -60,7 +60,7 @@ public class Main {
 
         //  crepc1scraper.searchForRecordKeyword("Monitorovanie a oprava oceľového potrubia používaného na transport plynu a ropy");
         //crepc1scraper.searchForRecordKeyword("Tools for organizational changes managing in companies with high qualified employees");
-
+*/
     }
 
     public static ResultSet databaseConnection() {
