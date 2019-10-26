@@ -45,43 +45,50 @@ public class CREPC2scraper {
     }
     public void searchForRecordKeyword(String recordName, String isbn){
         this.recordname = recordName;
-        recordNameForSearch=recordName.replace("'"," ");
-        if(recordName.endsWith(" ")){
+        while (recordName.endsWith(" ")){
             recordName = recordname.substring(0, recordName.length()-1);
         }
-        driver.get("https://app.crepc.sk/?fn=AdvancedSearchChildO6ST&search=advanced&entity=0&seo=CREP%C4%8C-H%C4%BEadanie");
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")));
-        //recordname = recordName.replace("'", " ");
-        driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).clear();
-        driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).sendKeys(recordNameForSearch);
-        driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).sendKeys(Keys.RETURN);
-        ArrayList<String> elementsString = new ArrayList<String>();
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        List<WebElement> ord = null;
-        int elementsSize = 0;
-        driver.manage().timeouts().implicitlyWait(2000, TimeUnit.MILLISECONDS);
-        //driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).get(i).getText()
-        if(isbn.length()>0) {
-            isbn = isbn.substring(isbn.lastIndexOf("N")+2, isbn.length()-1);
-            while (isbn.endsWith(" ")){
-                isbn = isbn.substring(0,isbn.length()-1);
-            }
+        while (isbn.endsWith(" ")){
+            isbn = isbn.substring(0,isbn.length()-1);
         }
+        recordNameForSearch=recordName.replace("'"," ");
+        recordNameForSearch=recordNameForSearch.replace("\""," ");
+        try {
 
-        if(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).size()>0) {
-            if (wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']"))).size() > 0) {
-               // ord = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")));
-                //elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).size();
-                elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName +  "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap")).size();
-                //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@class='btn btn-default text-wrap']")));
+
+            driver.get("https://app.crepc.sk/?fn=AdvancedSearchChildO6ST&search=advanced&entity=0&seo=CREP%C4%8C-H%C4%BEadanie");
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")));
+            //recordname = recordName.replace("'", " ");
+            driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).clear();
+            driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).sendKeys(recordNameForSearch);
+            driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).sendKeys(Keys.RETURN);
+            ArrayList<String> elementsString = new ArrayList<String>();
+            WebDriverWait wait = new WebDriverWait(driver, 10);
+            List<WebElement> ord = null;
+            int elementsSize = 0;
+            driver.manage().timeouts().implicitlyWait(2000, TimeUnit.MILLISECONDS);
+            //driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).get(i).getText()
+            if (isbn.length() > 0) {
+                isbn = isbn.substring(isbn.lastIndexOf("N") + 2, isbn.length() - 1);
+                while (isbn.endsWith(" ")) {
+                    isbn = isbn.substring(0, isbn.length() - 1);
+                }
             }
-            for (int i = 0; i < elementsSize; i++) {
-                elementsString.add(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap")).get(i).getText());
-            }
-            StringBuilder sb = new StringBuilder();
-            for (String e : elementsString) {
-                sb.append(e + ", ");
-            }
+
+            if (driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).size() > 0) {
+                if (wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']"))).size() > 0) {
+                    // ord = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")));
+                    //elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).size();
+                    elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap")).size();
+                    //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@class='btn btn-default text-wrap']")));
+                }
+                for (int i = 0; i < elementsSize; i++) {
+                    elementsString.add(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap")).get(i).getText());
+                }
+                StringBuilder sb = new StringBuilder();
+                for (String e : elementsString) {
+                    sb.append(e + ", ");
+                }
 
       /*  if(driver.findElements(By.xpath("//a[@class='btn btn-default text-wrap']div[@class='col-sm-12'][contains(.,'" + isbn + "')]")).size()>0) {driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName +  "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap"))
             if (wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']"))).size() > 0) {
@@ -105,9 +112,16 @@ public class CREPC2scraper {
             sb.substring(0,sb.length()-1);
         }*/
 
-      // driver.findElements(By.xpath("//[@class='col-sm-12'][contains(.,'" + isbn + "')]"));
+                // driver.findElements(By.xpath("//[@class='col-sm-12'][contains(.,'" + isbn + "')]"));
 
-            insertToDatabase(sb.toString());
+                insertToDatabase(sb.toString());
+            }
+            if (driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).size() > 0) {
+            insertToDatabaseEmtpy();
+            }
+            }
+        catch (Exception e){
+            e.printStackTrace();
         }
 
     }
@@ -119,7 +133,7 @@ public class CREPC2scraper {
             System.out.println("Keywords: " + keywords);
             ResultSet resultset = databaseConnection();
             while (resultset.next()) {
-                if (resultset.getString("nazov").equalsIgnoreCase(recordname.endsWith(" ") ? recordname :recordname +" ")) {
+                if (resultset.getString("nazov").equalsIgnoreCase(recordname)|| resultset.getString("nazov").equalsIgnoreCase(recordname + " ")){
 //                    StringBuilder sb = new StringBuilder();
 //                    for (String s : wordList)
 //                    {
@@ -146,6 +160,40 @@ public class CREPC2scraper {
                     }
                     break;
 
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public void insertToDatabaseEmtpy() {
+        try {
+            ResultSet resultset = databaseConnection();
+            while (resultset.next()) {
+                if (resultset.getString("nazov").equalsIgnoreCase(recordname)|| resultset.getString("nazov").equalsIgnoreCase(recordname + " ")){
+
+                    dieloId = resultset.getInt("zaznam_id");
+                    String query = "insert into dielo.klucove_slova values (?) where zaznam_id = " + dieloId;
+                    String sql = "UPDATE dielo " +
+                            "SET klucove_slova = " + "'" +"---" + "'" + " WHERE zaznam_id=" + dieloId;
+                    try {
+                        try {
+                            con = DriverManager.getConnection(url, user, pass);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        PreparedStatement ps = con.prepareStatement(sql);
+                        //       ps.setString(1, keyWordsFull);
+
+                        ps.executeUpdate();
+                        ps.close();
+                        break;
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (SQLException e) {

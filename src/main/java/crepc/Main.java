@@ -9,8 +9,10 @@ public class Main {
     public static void main(String[] args) {
        ResultSet resultSet = databaseConnection();
       CREPC1scraper crepc1scraper = new CREPC1scraper(resultSet);
-      CREPC2scraper crepc2scraper = new CREPC2scraper();
-       // crepc1scraper.searchForRecordKeyword("Organizácia a riadenie výroby ", "ISBN 978-80-8073-915-7");
+     CREPC2scraper crepc2scraper = new CREPC2scraper();
+     int crepc1counter = 0;
+     int crepc2counter = 0;
+       // crepc1scraper.searchForRecordKeyword("Management Tool for Effective  Decision - Business Intelligence ", "ISSN 2048-4186 ");
         //  crepc2scraper.searchForRecordKeyword("Open structured databases' use in destination management ", "ISBN 978-90-828093-5-0 ");
        /* try{
             while (resultSet.next()){
@@ -25,11 +27,17 @@ public class Main {
         try {
             assert resultSet != null;
             while (resultSet.next()) {
-                if (resultSet.getString("klucove_slova") == null || resultSet.getString("klucove_slova").equalsIgnoreCase("")) {
+                if(crepc2counter > 20){
+
+                    crepc2scraper = new CREPC2scraper();
+                    crepc2counter = 0;
+                }
+                if (resultSet.getString("klucove_slova") == null || resultSet.getString("klucove_slova").equalsIgnoreCase("") || resultSet.getString("klucove_slova").equalsIgnoreCase("---")) {
                     System.out.println("Doing: " + resultSet.getRow());
 
 
                     if (Integer.valueOf(resultSet.getString("rok_vydania")) <= 2017) {
+                        crepc1counter++;
 
 
                         if (resultSet.getString("ISBN") != null) {
@@ -42,6 +50,7 @@ public class Main {
                         }
                         System.out.println();
                     } else {
+                        crepc2counter++;
                         if (resultSet.getString("ISBN") != null) {
                             crepc2scraper.searchForRecordKeyword(resultSet.getString("nazov"), resultSet.getString("ISBN"));
                         } else if (resultSet.getString("ISSN") != null) {
