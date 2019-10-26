@@ -42,16 +42,29 @@ public class CREPC1scraper {
 
     public void searchForRecordKeyword(String recordName, String isbn) {
         this.recordname = recordName;
-        if(recordName.endsWith(" ")){
+        while (recordName.endsWith(" ")){
             recordName = recordname.substring(0, recordName.length()-1);
         }
+        while (isbn.endsWith(" ")){
+            isbn = isbn.substring(0,isbn.length()-1);
+        }
+        String recordNameForSearch;
+        recordNameForSearch=recordName.replace("'"," ");
+        recordNameForSearch=recordNameForSearch.replace("\""," ");
+        try {
+
+
         driver.get("http://www.crepc.sk/portal?fn=SearchForm");
         driver.findElement(By.xpath("//*[@id=\"googleedit\"]")).clear();
-        driver.findElement(By.xpath("//*[@id=\"googleedit\"]")).sendKeys(recordName);
+        driver.findElement(By.xpath("//*[@id=\"googleedit\"]")).sendKeys(recordNameForSearch);
         driver.findElement(By.xpath("//*[@id=\"googleedit\"]")).sendKeys(Keys.RETURN);
         //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"divChck_1\"]/div[3]/a")));
         if(driver.findElements(By.xpath("//*[contains(@id, 'divChck')]")).size()==1) {
-            if (driver.findElement(By.xpath("//*[@id=\"divChck_1\"]/div[2]/b")).getText().equalsIgnoreCase(recordName)) {
+            String pageRecordName = driver.findElement(By.xpath("//*[@id=\"divChck_1\"]/div[2]/b")).getText();
+            while (pageRecordName.endsWith(" ")){
+                recordName = recordname.substring(0, recordName.length()-1);
+            }
+            if (pageRecordName.equalsIgnoreCase(recordName)) {
                 driver.findElement(By.xpath("//*[@id=\"divChck_1\"]/div[3]/a")).click();
                 //*[@id="divChck_1"]/div[3]/a
                 //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"divChck_1\"]/div[3]/a")));
@@ -88,6 +101,15 @@ public class CREPC1scraper {
 
             }
         }
+            if(driver.findElements(By.xpath("//*[contains(@id, 'divChck')]")).size()>1) {
+                insertToDatabaseEmtpy();
+            }
+
+
+            }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public ArrayList<String> parseKeywords(String keywords) {
@@ -123,7 +145,7 @@ public class CREPC1scraper {
         try {
             ResultSet resultset = databaseConnection();
             while (resultset.next()) {
-                if (resultset.getString("nazov").equalsIgnoreCase(recordname)) {
+                if (resultset.getString("nazov").equalsIgnoreCase(recordname)|| resultset.getString("nazov").equalsIgnoreCase(recordname + " ")){
                     StringBuilder sb = new StringBuilder();
                     for (String s : wordList)
                     {
@@ -134,6 +156,40 @@ public class CREPC1scraper {
                     String query = "insert into dielo.klucove_slova values (?) where zaznam_id = " + dieloId;
                     String sql = "UPDATE dielo " +
                             "SET klucove_slova = " + "'" + sb.toString() + "'" + " WHERE zaznam_id=" + dieloId;
+                    try {
+                        try {
+                            con = DriverManager.getConnection(url, user, pass);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        PreparedStatement ps = con.prepareStatement(sql);
+                        //       ps.setString(1, keyWordsFull);
+
+                        ps.executeUpdate();
+                        ps.close();
+                        break;
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public void insertToDatabaseEmtpy() {
+        try {
+            ResultSet resultset = databaseConnection();
+            while (resultset.next()) {
+                if (resultset.getString("nazov").equalsIgnoreCase(recordname)|| resultset.getString("nazov").equalsIgnoreCase(recordname + " ")){
+
+                    dieloId = resultset.getInt("zaznam_id");
+                    String query = "insert into dielo.klucove_slova values (?) where zaznam_id = " + dieloId;
+                    String sql = "UPDATE dielo " +
+                            "SET klucove_slova = " + "'" +"---" + "'" + " WHERE zaznam_id=" + dieloId;
                     try {
                         try {
                             con = DriverManager.getConnection(url, user, pass);
