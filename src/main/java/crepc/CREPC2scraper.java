@@ -50,7 +50,7 @@ public class CREPC2scraper {
             recordName = recordname.substring(0, recordName.length()-1);
         }
         driver.get("https://app.crepc.sk/?fn=AdvancedSearchChildO6ST&search=advanced&entity=0&seo=CREP%C4%8C-H%C4%BEadanie");
-//        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"B7T\"]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")));
         //recordname = recordName.replace("'", " ");
         driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).clear();
         driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).sendKeys(recordNameForSearch);
