@@ -1,8 +1,17 @@
 package tabulky;
 
 public class Autor {
+    private Integer autor_id = null;
     private String meno = null;
     private String priezvisko = null;
+
+    public Integer getAutor_id() {
+        return autor_id;
+    }
+
+    public void setAutor_id(Integer autor_id) {
+        this.autor_id = autor_id;
+    }
 
     public String getMeno() {
         return meno;
