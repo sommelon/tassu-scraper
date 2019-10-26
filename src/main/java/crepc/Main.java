@@ -12,7 +12,7 @@ public class Main {
        CREPC2scraper crepc2scraper = new CREPC2scraper();
 
 
-      crepc2scraper.searchForRecordKeyword("Open structured databases' use in destination management ", "ISBN 978-90-828093-5-0 ");
+      //crepc2scraper.searchForRecordKeyword("Open structured databases' use in destination management ", "ISBN 978-90-828093-5-0 ");
        /* try{
             while (resultSet.next()){
                 crepc2scraper.searchForRecordKeyword(resultSet.getString("nazov"), "");
@@ -23,7 +23,7 @@ public class Main {
             e.printStackTrace();
 
         }*/
-       /* try {
+        try {
             assert resultSet != null;
             while (resultSet.next()) {
                 System.out.println("Doing: " + resultSet.getRow());
@@ -55,7 +55,7 @@ public class Main {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }*/
+        }
 
 
         //  crepc1scraper.searchForRecordKeyword("Monitorovanie a oprava oceľového potrubia používaného na transport plynu a ropy");
