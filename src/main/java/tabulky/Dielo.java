@@ -1,18 +1,18 @@
 package tabulky;
 
 public class Dielo {
-    private String archivacne_cislo = "";
+    private String archivacne_cislo = null;
     private Integer rok_vydania = null;
-    private String nazov = "";
-    private String podnazov = "";
-    private String vydanie = "";
-    private String ISBN = "";
-    private String ISSN = "";
-    private String miesto_vydania = "";
-    private String klucove_slova = "";
-    private String odkaz = "";
-    private String strany = "";
-    private String priloha = "";
+    private String nazov = null;
+    private String podnazov = null;
+    private String vydanie = null;
+    private String ISBN = null;
+    private String ISSN = null;
+    private String miesto_vydania = null;
+    private String klucove_slova = null;
+    private String odkaz = null;
+    private String strany = null;
+    private String priloha = null;
 
     public String getArchivacne_cislo() {
         return archivacne_cislo;

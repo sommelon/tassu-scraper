@@ -1,8 +1,8 @@
 package tabulky;
 
 public class Kategoria {
-    private String kod = "";
-    private String popis = "";
+    private String kod = null;
+    private String popis = null;
     private int skupina_id;
 
     public String getKod() {
