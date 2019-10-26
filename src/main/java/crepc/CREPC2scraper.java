@@ -20,6 +20,7 @@ public class CREPC2scraper {
     private WebDriverWait wait;
     private ResultSet resultSet;
     private String recordname;
+    private String recordNameForSearch;
     private static final String url = "jdbc:mysql://localhost:3306/tssu?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private static final String user = "root";
     private static final String pass = "root";
@@ -44,14 +45,15 @@ public class CREPC2scraper {
     }
     public void searchForRecordKeyword(String recordName, String isbn){
         this.recordname = recordName;
+        recordNameForSearch=recordName.replace("'"," ");
         if(recordName.endsWith(" ")){
             recordName = recordname.substring(0, recordName.length()-1);
         }
         driver.get("https://app.crepc.sk/?fn=AdvancedSearchChildO6ST&search=advanced&entity=0&seo=CREP%C4%8C-H%C4%BEadanie");
 //        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"B7T\"]")));
-        recordname = recordName.replace("'", " ");
+        //recordname = recordName.replace("'", " ");
         driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).clear();
-        driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).sendKeys(recordName);
+        driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).sendKeys(recordNameForSearch);
         driver.findElement(By.xpath("//input[@placeholder='Zadajte text pre hľadanie...']")).sendKeys(Keys.RETURN);
         ArrayList<String> elementsString = new ArrayList<String>();
         WebDriverWait wait = new WebDriverWait(driver, 10);
@@ -66,14 +68,14 @@ public class CREPC2scraper {
             }
         }
 
-        if(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")).size()>0) {
+        if(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).size()>0) {
             if (wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']"))).size() > 0) {
                // ord = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")));
-                elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).size();
+                elementsSize = driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).size();
                 //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@class='btn btn-default text-wrap']")));
             }
             for (int i = 0; i < elementsSize; i++) {
-                elementsString.add(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,'" + recordName + "')][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).get(i).getText());
+                elementsString.add(driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.xpath("//a[@class='btn btn-default text-wrap']")).get(i).getText());
             }
             StringBuilder sb = new StringBuilder();
             for (String e : elementsString) {
