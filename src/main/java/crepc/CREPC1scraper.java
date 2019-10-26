@@ -70,7 +70,7 @@ public class CREPC1scraper {
             if (driver.findElements(By.xpath("//div[@class='mid'][contains(.,'" + isbn + "') ]")).size() > 0) {
                 if(driver.findElements(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "') and contains (.,\"" + recordName + "\")]")).size()>0) {
                     if (driver.findElement(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "')and contains(.,\"" + recordName + "\")]")).getText().contains(isbn)) {
-                        WebElement childElement = driver.findElement(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "')]"));
+                        WebElement childElement = driver.findElement(By.xpath("//div[@class='mid' and contains(.,'" + isbn + "')and contains(.,\"" + recordName + "\")]"));
                         WebElement parent = (WebElement) ((JavascriptExecutor) driver)
                                 .executeScript("return arguments[0].parentNode;", childElement);
                         String numberOfRecord = parent.getText().substring(0, parent.getText().indexOf("\n"));
