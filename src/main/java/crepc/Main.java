@@ -39,7 +39,7 @@ public class Main {
             CREPC2scraper crepc2scraper = new CREPC2scraper();
 
             while (resultSet.next()) {
-                if (crepc2counter > 1) {
+                if (crepc2counter > 20) {
                     crepc2scraper.close();
                     crepc2scraper = new CREPC2scraper();
                     crepc2counter = 0;
