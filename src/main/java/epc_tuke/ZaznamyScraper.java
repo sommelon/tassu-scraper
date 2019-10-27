@@ -43,16 +43,17 @@ public class ZaznamyScraper {
     private Pattern rokNaKonciP = Pattern.compile("[,\\- ]?\\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
     private Pattern cisloNaKonciP = Pattern.compile("- [\\(\\[]?[0-9][\\)\\]]? *$"); //rok na konci riadku - mal by byt na konci miesta vydania
     private Pattern stranyNeuvedeneP = Pattern.compile("([SPsp]\\.? neuved[^ \\-\n]?)|(neuved[^ \\-\n]? [SPsp]\\.?)");
-    private Pattern strany1P = Pattern.compile("(\\[[^\\]]+\\] )?[PSps]\\.?\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])( \\[[^\\]]+\\])*"); //strany aj s poznamkou v hranatych zatvorkach
-    private Pattern strany2P = Pattern.compile("(\\[[^\\]]+\\] )?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?\\.?( \\[[^\\]]+\\])*");// 86 p [CD-ROM]; [86] p; 86 p
+    private Pattern strany1P = Pattern.compile(" [PSps]\\.?\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])"); //strany aj s poznamkou v hranatych zatvorkach
+    private Pattern strany2P = Pattern.compile(" ([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?\\.?");// 86 p [CD-ROM]; [86] p; 86 p
+    private Pattern prilohaP = Pattern.compile("( \\[[\\p{L} :\\-]+\\])+"); //[CD-ROM] [USB kluc]
     private Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? ?[^-]*)-");
     private Pattern podielP = Pattern.compile("[0-9]{1,3}");
     private Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
     private Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
     private Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$|\\[\\]");
-    private Pattern autorOhlasuP = Pattern.compile("\\p{Lu}+, \\p{Lu}[^, :]+");
+    private Pattern autorOhlasuP = Pattern.compile("\\p{Lu}+ ?, ?\\p{Lu}[^, :]+");
     private Pattern etalP = Pattern.compile("(et al\\.|\\[et al\\.\\]):?");
-    private Pattern nazovOhlasuP = Pattern.compile("^((?=In:)|[^.])+"); //od zaciatku riadku po In: alebo po bodku - pravdepodobne to niekde matchne zle
+    private Pattern nazovOhlasuP = Pattern.compile("^.+In:|^[^.]+"); //od zaciatku riadku po In: alebo po bodku - pravdepodobne to niekde matchne zle
 
     public ZaznamyScraper() {
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
@@ -90,7 +91,8 @@ public class ZaznamyScraper {
             fakultaOption.click();
 
             //najde a klikne na stredisko
-            wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
+//            wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
             driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")).click();
             if (fakultaValue.equals("09")) {
                 wait.until(ExpectedConditions.presenceOfElementLocated(
@@ -134,6 +136,8 @@ public class ZaznamyScraper {
                 exctractDataFromTableRow(riadokTabulky);
             } catch (SQLException e) {
                 e.printStackTrace();
+            } catch (NullPointerException e){
+                e.printStackTrace();
             }
         }
 
@@ -146,7 +150,7 @@ public class ZaznamyScraper {
             goToPage(currentPage+1);
             scrape();
         } catch (NoSuchPageException e){
-            System.out.println(ANSI_RED+ "Strana "+ currentPage+1 +" neexistuje." +ANSI_RESET);
+            System.out.println(ANSI_RED+ "Strana "+ (currentPage+1) +" neexistuje." +ANSI_RESET);
         }
     }
 
@@ -214,6 +218,17 @@ public class ZaznamyScraper {
                 ostatne = m.replaceAll("");
             }
 
+            m = prilohaP.matcher(ostatne);
+            if (m.find()) {
+                String priloha = dielo.getPriloha();
+                if (priloha != null)
+                    dielo.setPriloha(priloha +", "+ m.group(0));
+                else
+                    dielo.setPriloha(m.group(0));
+
+                ostatne = m.replaceAll("");
+            }
+
             m = stranyNeuvedeneP.matcher(ostatne);
             if (!m.find()) { //ak nenajde nejaku variaciu p neuved tak bude kontrolovat ostatne normalne
                 m = strany1P.matcher(ostatne); //najprv sa najde vyraz strany1P kvoli pripadu ked rok nie je oddeleny nicim (okrem medzery) (2016 S. 109-114)
@@ -242,26 +257,15 @@ public class ZaznamyScraper {
                 } else {
                     ostatne = ostatneArray[1];
                 }
-                System.out.println(ANSI_YELLOW + "ostatneArray[0]: " + ostatneArray[0] + ANSI_RESET);
-                System.out.println(ANSI_YELLOW + "ostatneArray[1]: " + ostatneArray[1] + ANSI_RESET);
+//                System.out.println(ANSI_YELLOW + "ostatneArray[0]: " + ostatneArray[0] + ANSI_RESET);
+//                System.out.println(ANSI_YELLOW + "ostatneArray[1]: " + ostatneArray[1] + ANSI_RESET);
             } else {
                 ostatne = ostatneArray[0];
             }
 
-//        Pattern miesto_vydania1P = Pattern.compile("In:(- )?[A-Z][^:\n]+: [a-zA-Z ,]+(, -| -)");
-//        m = miesto_vydania1P.matcher(ostatne);
-//        if (m.find()) {
-//            String miesto_vydania = m.group(0);
-//            dielo.setMiesto_vydania(miesto_vydania);
-//            ostatne = m.replaceAll("");
-//        }
-
             ostatne = odstranitZnakyARokyNaStranach(ostatne);
 
             dielo.setMiesto_vydania(ostatne);
-            System.out.println(dielo);
-            if (dielo.getPriloha() != null)
-                System.out.println(ANSI_YELLOW + "\tPriloha: " + dielo.getPriloha() + ANSI_RESET);
 
             //---------------------------Ohlasy---------------------------------
             m = ohlasP.matcher(riadokTabulky.findElement(By.xpath("td[5]/p")).getAttribute("innerHTML"));
@@ -292,10 +296,13 @@ public class ZaznamyScraper {
                     autor.setPriezvisko(priezviskoAMeno[0]);
                     autor.setMeno(priezviskoAMeno[1]);
                 } else { //ak nie je meno a priezvisko oddelene ciarkou
-                    String priezvisko = priezviskoAMeno[0].substring(0, priezviskoAMeno[0].indexOf(" ")); //priezvisko po prvu medzeru
-                    String meno = priezviskoAMeno[0].substring(priezviskoAMeno[0].indexOf(" ") + 1);
+                    String priezvisko = priezviskoAMeno[0];
+                    if (priezvisko.contains(" ")) { //su aj autori bez prvych mien................ rly?
+                        priezvisko = priezviskoAMeno[0].substring(0, priezviskoAMeno[0].indexOf(" ")); //priezvisko po prvu medzeru
+                        String meno = priezviskoAMeno[0].substring(priezviskoAMeno[0].indexOf(" ") + 1);
+                        autor.setMeno(meno);
+                    }
                     autor.setPriezvisko(priezvisko);
-                    autor.setMeno(meno);
                 }
                 autori.add(autor);
             }
@@ -321,12 +328,15 @@ public class ZaznamyScraper {
     private void nahratDoDB(Dielo dielo, ArrayList<Autor> autori, ArrayList<Ohlas> ohlasy, ArrayList<Integer> podiely) throws SQLException {
         ResultSet rs;
         rs = db.insertIntoDiela(dielo);
+        rs.next();
         dielo.setDielo_id(rs.getInt(1));
-
+        System.out.println("--------------------------------------------------------------------------");
+        System.out.println(dielo);
         for (Autor autor : autori) {
             rs = db.insertIntoAutori(autor);
             if(rs.next())
                 autor.setAutor_id(rs.getInt(1));
+            System.out.println("\t"+ autor);
         }
 
         for (int i = 0; i < autori.size(); i++) {
@@ -334,25 +344,27 @@ public class ZaznamyScraper {
         }
 
         for (Ohlas ohlas : ohlasy) {
-            rs = db.selectOhlas(ohlas.getNazov());
+            rs = db.selectOhlas(ohlas.getNazov(), ohlas.getRok_vydania());
             if (!rs.next()) { //ak ohlas este nie je v databaze, vlozi sa tam
                 rs = db.insertIntoOhlasy(ohlas);
+                rs.next();
                 ohlas.setOhlas_id(rs.getInt(1));
 
                 for (Autor autor : ohlas.getAutori()) {
                     rs = db.insertIntoAutori(autor);
                     if(rs.next())
                         autor.setAutor_id(rs.getInt(1));
+                    System.out.println("\t\t"+ autor);
                 }
 
                 for (int i = 0; i < ohlas.getAutori().size(); i++) {
                     db.insertIntoAutorOhlas(ohlas.getAutori().get(i).getAutor_id(), ohlas.getOhlas_id());
                 }
-            }else {
-                ohlas.setOhlas_id(rs.getInt(1));
+
+                db.insertIntoDieloOhlas(dielo.getDielo_id(), ohlas.getOhlas_id());
             }
 
-            db.insertIntoDieloOhlas(dielo.getDielo_id(), ohlas.getOhlas_id());
+            System.out.println("\t"+ ohlas);
         }
     }
 
@@ -403,10 +415,13 @@ public class ZaznamyScraper {
                     autor.setPriezvisko(priezviskoAMeno[0]);
                     autor.setMeno(priezviskoAMeno[1]);
                 } else { //ak nie je meno a priezvisko oddelene ciarkou
-                    String priezvisko = priezviskoAMeno[0].substring(0, priezviskoAMeno[0].indexOf(" ")); //priezvisko po prvu medzeru
-                    String meno = priezviskoAMeno[0].substring(priezviskoAMeno[0].indexOf(" ") + 1);
+                    String priezvisko = priezviskoAMeno[0];
+                    if (priezvisko.contains(" ")) { //su aj autori bez prvych mien................ rly?
+                        priezvisko = priezviskoAMeno[0].substring(0, priezviskoAMeno[0].indexOf(" ")); //priezvisko po prvu medzeru
+                        String meno = priezviskoAMeno[0].substring(priezviskoAMeno[0].indexOf(" ") + 1);
+                        autor.setMeno(meno);
+                    }
                     autor.setPriezvisko(priezvisko);
-                    autor.setMeno(meno);
                 }
                 ohlas.getAutori().add(autor);
             }
@@ -417,8 +432,13 @@ public class ZaznamyScraper {
 
             mo = nazovOhlasuP.matcher(ostatne);
             if (mo.find()){
-                ohlas.setNazov(mo.group(0));
+                String nazov = mo.group(0);
+                if (nazov.contains("In:"))
+                     nazov = mo.group(0).substring(0, mo.group(0).length()-4);
+                ohlas.setNazov(nazov);
                 ostatne = mo.replaceAll("");
+                if (nazov.contains("In:"))
+                    ostatne = "In:"+ ostatne;
             } else {
                 System.err.println("Nazov ohlasu sa nenasiel.");
             }
@@ -428,7 +448,6 @@ public class ZaznamyScraper {
             ohlas.setMiesto_vydania(ostatne);
 
             ohlasy.add(ohlas);
-            System.out.println(ohlas);
         }
 
         return ohlasy;
@@ -437,12 +456,13 @@ public class ZaznamyScraper {
     private String odstranitZnakyARokyNaStranach (String s){
         Matcher m;
         m = znakyNaStranachP.matcher(s);
-        while (m.find()) {
+        do{
             s = m.replaceAll("");
             s = rokNaKonciP.matcher(s).replaceAll("");
             s = cisloNaKonciP.matcher(s).replaceAll("");
             m = znakyNaStranachP.matcher(s);
-        }
+        } while (m.find());
+
         return s;
     }
 

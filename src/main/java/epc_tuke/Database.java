@@ -7,7 +7,7 @@ import java.util.Hashtable;
 
 public class Database {
     private static Database singleInstance = null;
-    private final String url = "jdbc:mysql://localhost:3306/tests?useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private final String url = "jdbc:mysql://localhost:3306/tassu?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "qwer";
     private Connection con = null;
@@ -21,7 +21,7 @@ public class Database {
     private String sAutor = "select autor_id from autori where meno = ? and priezvisko = ?";
     private String iOhlas = "insert into ohlasy (rok_vydania, nazov, ISBN, ISSN, miesto_vydania, strany, kategorie_ohlasov_id) values (?,?,?,?,?,?,?)";
     private String iAutorOhlas = "insert into autor_ohlas (autor_id, ohlas_id) values (?,?)";
-    private String sOhlas = "select ohlas_id from ohlasy where nazov = ?";
+    private String sOhlas = "select ohlas_id from ohlasy where nazov = ? and rok_vydania = ?";
     private String sAutorIdAPodiel = "select autor_id, percentualny_podiel from autor_dielo_pracovisko where dielo_id = ?";
     private String iAutorDieloPracovisko = "insert into autor_dielo_pracovisko (autor_id, dielo_id, pracovisko_id, percentualny_podiel) values (?,?,?,?)";
 
@@ -43,6 +43,13 @@ public class Database {
 
     private Database(){
         openConnection();
+        selectKategorie();
+        selectPracoviska();
+
+        System.out.println("Kategorie:");
+        for (String s : kategorie.keySet()) {
+            System.out.print(s+", ");
+        }
     }
 
     public static Database getInstance(){
@@ -178,19 +185,6 @@ public class Database {
         return rs;
     }
 
-    public ResultSet selectAutorIdAPodielByDielo(Integer dielo_id){
-        ResultSet rs = null;
-
-        try {
-            psAutorIdAPodielByDielo.setInt(1, dielo_id);
-            rs = psAutorIdAPodielByDielo.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return rs;
-    }
-
     public void insertIntoAutorDieloPracovisko(Integer autor_id, Integer dielo_id, Integer pracovisko_id, Integer percentualny_podiel){
         try {
             psAutorDieloPracovisko.setInt(1, autor_id);
@@ -209,25 +203,16 @@ public class Database {
         }
     }
 
-    public void insertIntoAutorOhlas(Integer autor_id, Integer ohlas_id){
-        try {
-            psAutorOhlas.setInt(1, autor_id);
-            psAutorOhlas.setInt(2, ohlas_id);
-
-            psAutorOhlas.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public ResultSet selectOhlas(String nazov){
+    public ResultSet selectAutorIdAPodielByDielo(Integer dielo_id){
         ResultSet rs = null;
+
         try {
-            psOhlasSelect.setString(1, nazov);
-            rs = psOhlasSelect.executeQuery();
+            psAutorIdAPodielByDielo.setInt(1, dielo_id);
+            rs = psAutorIdAPodielByDielo.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return rs;
     }
 
@@ -245,6 +230,29 @@ public class Database {
 
             psOhlas.executeUpdate();
             rs = psOhlas.getGeneratedKeys();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rs;
+    }
+
+    public void insertIntoAutorOhlas(Integer autor_id, Integer ohlas_id){
+        try {
+            psAutorOhlas.setInt(1, autor_id);
+            psAutorOhlas.setInt(2, ohlas_id);
+
+            psAutorOhlas.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ResultSet selectOhlas(String nazov, Integer rok){
+        ResultSet rs = null;
+        try {
+            psOhlasSelect.setString(1, nazov);
+            psOhlasSelect.setInt(2, rok);
+            rs = psOhlasSelect.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
         }

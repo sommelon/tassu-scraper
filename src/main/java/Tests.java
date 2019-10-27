@@ -78,5 +78,8 @@ public class Tests {
                 "<br> <br> 2007  [3] MICHALÍKOVÁ, F. et al.: Vlastnosti hnedouhoľných popolčekov zo spaľovania uhlia v tepelnej elektrárni ENO Nováky. In: Recyklace odpadů 11 - 1: 6.-7.12.2007. Ostrava: VŠB-TU, 2007. p. 241-247. ISBN 978-80-248-1597-8." +
                 "<br> <br> 2005  [3] VOKOROKOS, Liberios: Parallel computer system utilization in geographic information systems. In: ICCC 2005. IEEE 3rd International Conference on Computational Cybernetics. Mauritius : April 13-16,2005. Budapest: Tech, 2005. P. 333-338. ISBN 963-7154-37-X.\n";
 
+
+        int currentPage = 3;
+        System.out.println("Strana "+ (currentPage+1) +" neexistuje.");
     }
 }

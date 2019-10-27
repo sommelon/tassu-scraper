@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("headless");
+//        options.addArguments("headless");
         options.addArguments("window-size=1920x1080");
         options.addArguments("disable-infobars");
         WebDriver driver = new ChromeDriver(options);
@@ -55,26 +55,39 @@ public class Main {
 
         driver.quit();
 
-
 //        spustenie scrapera pre vsetky strediska
-        for (String stredisko : strediskaFBERGNazov) {
-            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-            zaznamyScraper.vybratPracovisko("01", stredisko);
-//            zaznamyScraper.scrape();
-            zaznamyScraper.getDriver().close();
+
+        //toto je len na to, aby som vedel zacat odkial chcem
+        {
+            strediskaLFNazov.remove(0);
+            strediskaLFNazov.remove(0);
+
+            ZaznamyScraper z = new ZaznamyScraper();
+            z.vybratPracovisko("09", strediskaLFNazov.get(0));
+            z.goToPage(7);
+            z.scrape();
+            z.getDriver().close();
+            strediskaLFNazov.remove(0);
         }
 
         for (String stredisko : strediskaLFNazov) {
             ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
             zaznamyScraper.vybratPracovisko("09", stredisko);
-//            zaznamyScraper.scrape();
+            zaznamyScraper.scrape();
+            zaznamyScraper.getDriver().close();
+        }
+
+        for (String stredisko : strediskaFBERGNazov) {
+            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+            zaznamyScraper.vybratPracovisko("01", stredisko);
+            zaznamyScraper.scrape();
             zaznamyScraper.getDriver().close();
         }
 
 //        ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-//        zaznamyScraper.vybratPracovisko("01", "101001");
-//        zaznamyScraper.vybratPracovisko("01", "Ústav riadenia výrobných procesov (Ústav geo a environmentálnych technológií)");
-//        zaznamyScraper.goToPage(8);
+////        zaznamyScraper.vybratPracovisko("01", "101001");
+//        zaznamyScraper.vybratPracovisko("09", "Dekanát LF");
+//        zaznamyScraper.goToPage(3);
 //        zaznamyScraper.scrape();
 
 

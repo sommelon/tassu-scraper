@@ -10,7 +10,6 @@ public class Ohlas {
     private String ISBN = null;
     private String ISSN = null;
     private String miesto_vydania = null;
-    private Integer dielo_id = null;
     private Integer kategoria_ohlasu_id = null;
 
     private ArrayList<Autor> autori = new ArrayList<Autor>();
@@ -71,14 +70,6 @@ public class Ohlas {
         this.miesto_vydania = miesto_vydania;
     }
 
-    public Integer getDielo_id() {
-        return dielo_id;
-    }
-
-    public void setDielo_id(Integer dielo_id) {
-        this.dielo_id = dielo_id;
-    }
-
     public Integer getKategoria_ohlasu_id() {
         return kategoria_ohlasu_id;
     }
@@ -105,7 +96,6 @@ public class Ohlas {
                 ", ISBN='" + ISBN + '\'' +
                 ", ISSN='" + ISSN + '\'' +
                 ", miesto_vydania='" + miesto_vydania + '\'' +
-                ", dielo_id=" + dielo_id +
                 ", kategoria_ohlasu_id=" + kategoria_ohlasu_id +
                 '}';
     }
