@@ -76,6 +76,11 @@ public class Main {
 //        zaznamyScraper.vybratPracovisko("01", "Ústav riadenia výrobných procesov (Ústav geo a environmentálnych technológií)");
 //        zaznamyScraper.goToPage(8);
 //        zaznamyScraper.scrape();
+
+
+
+        Database db = Database.getInstance();
+        db.closeConnection();
     }
 }
 
