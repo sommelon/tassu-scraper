@@ -85,15 +85,20 @@ public class ZaznamyScraper {
             wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ctl00_ContentPlaceHolderMain_ddlFakulta")));
             driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlFakulta")).click();
             WebElement fakultaOption = driver.findElement(
-                    By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlFakulta\"]/option[@value='"+fakultaValue+"']"));
+                    By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlFakulta\"]/option[@value='" + fakultaValue + "']"));
             wait.until(ExpectedConditions.elementToBeClickable(fakultaOption));
             fakultaOption.click();
 
             //najde a klikne na stredisko
             wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
             driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")).click();
-            wait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[@value='109001']")));
+            if (fakultaValue.equals("09")) {
+                wait.until(ExpectedConditions.presenceOfElementLocated(
+                        By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[@value='109001']")));
+            } else if (fakultaValue.equals("01")){
+                wait.until(ExpectedConditions.presenceOfElementLocated(
+                        By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[@value='101001']")));
+            }
             WebElement strediskoOption = driver.findElement(
                     By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[text()[contains(.,'"+strediskoName+"')]]"));
             wait.until(ExpectedConditions.elementToBeClickable(strediskoOption));
@@ -257,7 +262,7 @@ public class ZaznamyScraper {
             }
 
             dielo.setMiesto_vydania(ostatne);
-            System.out.println(ostatne);
+            System.out.println(dielo);
             if (dielo.getPriloha() != null)
                 System.out.println(ANSI_YELLOW + "\tPriloha: " + dielo.getPriloha() + ANSI_RESET);
 
@@ -342,14 +347,12 @@ public class ZaznamyScraper {
             if (mo.find()) {
                 ohlas.setISBN(mo.group(1));
                 ostatne = mo.replaceAll("");
-//                System.out.println("\tISBN: "+ohlas.getISBN());
             }
 
             mo = ISSNP.matcher(ostatne);
             if (mo.find()) {
                 ohlas.setISSN(mo.group(1));
                 ostatne = mo.replaceAll("");
-//                System.out.println("\tISSN: "+ohlas.getISSN());
             }
 
             mo = stranyNeuvedeneP.matcher(ostatne);
@@ -363,7 +366,6 @@ public class ZaznamyScraper {
                         ohlas.setStrany(mo.group(0));
                     }
                 }
-//                System.out.println("\tStrany: "+ohlas.getStrany());
             }
             ostatne = mo.replaceAll("");
             ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
@@ -383,7 +385,6 @@ public class ZaznamyScraper {
                     autor.setPriezvisko(priezvisko);
                     autor.setMeno(meno);
                 }
-                System.out.println(autor.getPriezvisko() +" "+ autor.getMeno());
             }
 
             ostatne = mo.replaceAll("");
@@ -409,6 +410,7 @@ public class ZaznamyScraper {
             ohlas.setMiesto_vydania(ostatne);
 
             ohlasy.add(ohlas);
+            System.out.println(ohlas);
         }
 
         return ohlasy;
