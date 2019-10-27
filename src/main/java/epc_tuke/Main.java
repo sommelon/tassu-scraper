@@ -58,24 +58,28 @@ public class Main {
 //        spustenie scrapera pre vsetky strediska
 
         //toto je len na to, aby som vedel zacat odkial chcem
-        {
-            strediskaLFNazov.remove(0);
-            strediskaLFNazov.remove(0);
+//        {
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//
+//            ZaznamyScraper z = new ZaznamyScraper();
+//            z.vybratPracovisko("09", strediskaLFNazov.get(0));
+//            z.goToPage(13);
+//            z.scrape();
+//            z.getDriver().close();
+//            strediskaLFNazov.remove(0);
+//        }
 
-            ZaznamyScraper z = new ZaznamyScraper();
-            z.vybratPracovisko("09", strediskaLFNazov.get(0));
-            z.goToPage(7);
-            z.scrape();
-            z.getDriver().close();
-            strediskaLFNazov.remove(0);
-        }
-
-        for (String stredisko : strediskaLFNazov) {
-            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-            zaznamyScraper.vybratPracovisko("09", stredisko);
-            zaznamyScraper.scrape();
-            zaznamyScraper.getDriver().close();
-        }
+//        for (String stredisko : strediskaLFNazov) {
+//            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+//            zaznamyScraper.vybratPracovisko("09", stredisko);
+//            zaznamyScraper.scrape();
+//            zaznamyScraper.getDriver().close();
+//        }
 
         for (String stredisko : strediskaFBERGNazov) {
             ZaznamyScraper zaznamyScraper = new ZaznamyScraper();

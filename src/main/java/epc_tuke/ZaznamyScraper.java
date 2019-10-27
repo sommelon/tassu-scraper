@@ -354,7 +354,7 @@ public class ZaznamyScraper {
                     rs = db.insertIntoAutori(autor);
                     if(rs.next())
                         autor.setAutor_id(rs.getInt(1));
-                    System.out.println("\t\t"+ autor);
+                    System.out.println("\t"+ autor);
                 }
 
                 for (int i = 0; i < ohlas.getAutori().size(); i++) {
@@ -364,7 +364,7 @@ public class ZaznamyScraper {
                 db.insertIntoDieloOhlas(dielo.getDielo_id(), ohlas.getOhlas_id());
             }
 
-            System.out.println("\t"+ ohlas);
+            System.out.println("\t\t"+ ohlas);
         }
     }
 
@@ -433,12 +433,14 @@ public class ZaznamyScraper {
             mo = nazovOhlasuP.matcher(ostatne);
             if (mo.find()){
                 String nazov = mo.group(0);
-                if (nazov.contains("In:"))
-                     nazov = mo.group(0).substring(0, mo.group(0).length()-4);
+                if (nazov.contains("In:")) {
+                    nazov = mo.group(0).substring(0, mo.group(0).length() - 4);
+                    ostatne = mo.replaceAll("");
+                    ostatne = "In:" + ostatne;
+                }else {
+                    ostatne = mo.replaceAll("");
+                }
                 ohlas.setNazov(nazov);
-                ostatne = mo.replaceAll("");
-                if (nazov.contains("In:"))
-                    ostatne = "In:"+ ostatne;
             } else {
                 System.err.println("Nazov ohlasu sa nenasiel.");
             }
