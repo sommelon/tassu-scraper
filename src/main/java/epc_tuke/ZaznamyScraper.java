@@ -50,6 +50,9 @@ public class ZaznamyScraper {
     private Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
     private Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
     private Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$|\\[\\]");
+    private Pattern autorOhlasuP = Pattern.compile("\\p{Lu}+, \\p{Lu}[^, :]+");
+    private Pattern etalP = Pattern.compile("(et al\\.|\\[et al\\.\\]):?");
+    private Pattern nazovOhlasuP = Pattern.compile("^((?=In:)|[^.])+"); //Od zaciatku riadku po slovo s velkym pismenom
 
     public ZaznamyScraper() {
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
@@ -151,7 +154,7 @@ public class ZaznamyScraper {
             wait.until(ExpectedConditions.textToBe(
                     By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter\"]/tbody/tr[last()]/td/table/tbody/tr/td/span"), Integer.toString(page)));
         }catch (StaleElementReferenceException e){
-            System.err.println("Nova strana "+ page +" sa nestihla nacitat zo stanoveny cas.");
+            System.err.println("Nova strana "+ page +" sa nestihla nacitat do stanoveneho casu.");
         }
         currentPage = page;
         System.out.println(ANSI_BLUE+ "Strana " + currentPage +ANSI_RESET);
@@ -223,6 +226,7 @@ public class ZaznamyScraper {
                 ostatne = m.replaceAll("");
             }
 
+            //---------------------------Miesto vydania---------------------------------
             String[] ostatneArray = ostatne.split("</span>");
             if (ostatneArray.length == 2) {
                 if (ostatneArray[1].length() <= ostatneArray[0].length()) { //ked je za </span> nic nie je, pracujeme iba s castou pred </span> (cislo 2 je tam keby nahodou bolo za spanom napr. "2 s")
@@ -257,39 +261,12 @@ public class ZaznamyScraper {
             if (dielo.getPriloha() != null)
                 System.out.println(ANSI_YELLOW + "\tPriloha: " + dielo.getPriloha() + ANSI_RESET);
 
+            //---------------------------Ohlasy---------------------------------
             m = ohlasP.matcher(riadokTabulky.findElement(By.xpath("td[5]/p")).getAttribute("innerHTML"));
 
-            List<String> ohlasyNespracovane = new ArrayList<String>();
-            ArrayList<Ohlas> ohlasy = new ArrayList<Ohlas>();
-            Matcher mo;
-            while (m.find()) {
-                Ohlas ohlas = new Ohlas();
-                ohlas.setRok_vydania(Integer.parseInt(m.group(1)));
-                ohlas.setKategoria_ohlasu_id(Integer.parseInt(m.group(2)));
+            ArrayList<Ohlas> ohlasy = spracovanieOhlasov(m);
 
-                ostatne = m.group(3);
-                mo = ISBNP.matcher(ostatne);
-                if (mo.find()) {
-                    ohlas.setISBN(mo.group(1));
-                    ostatne = mo.replaceAll("");
-                }
-
-                mo = ISSNP.matcher(ostatne);
-                if (mo.find()) {
-                    ohlas.setISSN(mo.group(1));
-                    ostatne = mo.replaceAll("");
-                }
-
-                ohlasy.add(ohlas);
-            }
-
-            for (String ohlasCely : ohlasyNespracovane) {
-                Ohlas ohlas = new Ohlas();
-                //TODO Zparsovat ohlas. Zatial sa dava cely do nazvu.
-                ohlas.setNazov(ohlasCely);
-                ohlasy.add(ohlas);
-            }
-
+            //---------------------------Autori---------------------------------
             String autoriNespracovane = riadokTabulky.findElement(By.xpath("td[5]/p/span[4]")).getText();
             //odstranenie hranatych zatvoriek na zaciatku a na konci
             autoriNespracovane = hranateZatvorkyP.matcher(autoriNespracovane).replaceAll("");
@@ -330,8 +307,12 @@ public class ZaznamyScraper {
                     autor.setAutor_id(rs.getInt(1));
             }
 
+            for (Ohlas ohlas : ohlasy) {
+
+            }
+
             //TODO nahrat do databazy
-        } else { //ak dielo uz je v tabulke,
+        } else { //ak dielo uz je v tabulke, urobi sa zaznam s novym pracoviskom v tabulke autor_dielo_pracovisko
             int dieloID = rs.getInt(1);
             rs = db.selectAutorIdAPodielByDielo(dieloID);
             ArrayList<Integer> autorIDs = new ArrayList<Integer>();
@@ -345,6 +326,92 @@ public class ZaznamyScraper {
                 db.insertIntoAutorDieloPracovisko(autorIDs.get(i), dieloID, pracoviskoID, podiely.get(i));
             }
         }
+    }
+
+    private ArrayList<Ohlas> spracovanieOhlasov(Matcher m){
+        ArrayList<Ohlas> ohlasy = new ArrayList<Ohlas>();
+        String ostatne;
+        Matcher mo;
+        while (m.find()) {
+            Ohlas ohlas = new Ohlas();
+            ohlas.setRok_vydania(Integer.parseInt(m.group(1)));
+            ohlas.setKategoria_ohlasu_id(Integer.parseInt(m.group(2)));
+
+            ostatne = m.group(3);
+            mo = ISBNP.matcher(ostatne);
+            if (mo.find()) {
+                ohlas.setISBN(mo.group(1));
+                ostatne = mo.replaceAll("");
+//                System.out.println("\tISBN: "+ohlas.getISBN());
+            }
+
+            mo = ISSNP.matcher(ostatne);
+            if (mo.find()) {
+                ohlas.setISSN(mo.group(1));
+                ostatne = mo.replaceAll("");
+//                System.out.println("\tISSN: "+ohlas.getISSN());
+            }
+
+            mo = stranyNeuvedeneP.matcher(ostatne);
+            if (!mo.find()) { //ak nenajde nejaku variaciu p neuved tak bude kontrolovat ostatne normalne
+                mo = strany1P.matcher(ostatne); //najprv sa najde vyraz strany1P kvoli pripadu ked rok nie je oddeleny nicim (okrem medzery) (2016 S. 109-114)
+                if (mo.find()) {
+                    ohlas.setStrany(mo.group(0));
+                } else { //ak podla prveho vyrazu nic nenajde, skusi druhy vyraz
+                    mo = strany2P.matcher(ostatne);
+                    if (mo.find()) {
+                        ohlas.setStrany(mo.group(0));
+                    }
+                }
+//                System.out.println("\tStrany: "+ohlas.getStrany());
+            }
+            ostatne = mo.replaceAll("");
+            ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
+            ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
+            ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
+
+            mo = autorOhlasuP.matcher(ostatne);
+            while (mo.find()){
+                String[] priezviskoAMeno = mo.group(0).split(", ");
+                Autor autor = new Autor();
+                if (priezviskoAMeno.length == 2) {
+                    autor.setPriezvisko(priezviskoAMeno[0]);
+                    autor.setMeno(priezviskoAMeno[1]);
+                } else { //ak nie je meno a priezvisko oddelene ciarkou
+                    String priezvisko = priezviskoAMeno[0].substring(0, priezviskoAMeno[0].indexOf(" ")); //priezvisko po prvu medzeru
+                    String meno = priezviskoAMeno[0].substring(priezviskoAMeno[0].indexOf(" ") + 1);
+                    autor.setPriezvisko(priezvisko);
+                    autor.setMeno(meno);
+                }
+                System.out.println(autor.getPriezvisko() +" "+ autor.getMeno());
+            }
+
+            ostatne = mo.replaceAll("");
+            ostatne = etalP.matcher(ostatne).replaceAll("");
+            ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
+
+            mo = nazovOhlasuP.matcher(ostatne);
+            if (mo.find()){
+                ohlas.setNazov(mo.group(0));
+                ostatne = mo.replaceAll("");
+            } else {
+                System.err.println("Nazov ohlasu sa nenasiel.");
+            }
+
+            mo = znakyNaStranachP.matcher(ostatne);
+            while (mo.find()) {
+                ostatne = mo.replaceAll("");
+                ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
+                ostatne = cisloNaKonciP.matcher(ostatne).replaceAll("");
+                mo = znakyNaStranachP.matcher(ostatne);
+            }
+
+            ohlas.setMiesto_vydania(ostatne);
+
+            ohlasy.add(ohlas);
+        }
+
+        return ohlasy;
     }
 
     private void checkCheckboxesAndSearch(){

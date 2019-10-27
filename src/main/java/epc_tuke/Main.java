@@ -57,12 +57,12 @@ public class Main {
 
 
 //        spustenie scrapera pre vsetky strediska
-//        for (String stredisko : strediskaFBERGNazov) {
-//            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-//            zaznamyScraper.vybratPracovisko("01", stredisko);
-////            zaznamyScraper.scrape();
-//            zaznamyScraper.getDriver().close();
-//        }
+        for (String stredisko : strediskaFBERGNazov) {
+            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+            zaznamyScraper.vybratPracovisko("01", stredisko);
+//            zaznamyScraper.scrape();
+            zaznamyScraper.getDriver().close();
+        }
 
         for (String stredisko : strediskaLFNazov) {
             ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
