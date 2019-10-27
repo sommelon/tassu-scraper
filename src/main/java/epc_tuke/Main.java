@@ -1,79 +1,104 @@
 package epc_tuke;
 
-import epc_tuke.Inserter;
-import epc_tuke.ZaznamyScraper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-//        System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
-//        ChromeOptions options = new ChromeOptions();
-////        options.addArguments("headless");
-//        options.addArguments("window-size=1920x1080");
-//        options.addArguments("disable-infobars");
-//        WebDriver driver = new ChromeDriver(options);
-//        WebDriverWait wait = new WebDriverWait(driver, 15);
-//
-//        driver.get("https://epc.lib.tuke.sk/PrehladPubl.aspx");
-//        driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlKrit1")).click();
+        System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("headless");
+        options.addArguments("window-size=1920x1080");
+        options.addArguments("disable-infobars");
+        WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, 15);
+
+        driver.get("https://epc.lib.tuke.sk/PrehladPubl.aspx");
+        driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlKrit1")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlKrit1"));
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//option[. = 'Pracovisko']")));
+            dropdown.findElement(By.xpath("//option[. = 'Pracovisko']")).click();
+        }
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
+
+        //ulozenie atributov value stredisk FBERG do zoznamu
+        driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")).click();
+        List<WebElement> strediskaFBERG = driver.findElements(By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[position()>1]"));
+        List<String> strediskaFBERGNazov = new ArrayList<String>();
+        for (WebElement webElement : strediskaFBERG) {
+            strediskaFBERGNazov.add(webElement.getText().substring(7));
+        }
+
+        //ulozenie atributov value stredisk LF do zoznamu
+        driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlFakulta")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlFakulta\"]/option[@value='09']")));
+        driver.findElement(By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlFakulta\"]/option[@value='09']")).click();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[@value='109001']")));
+        driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")).click();
+        List<WebElement> strediskaLF = driver.findElements(By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[position()>1]"));
+        List<String> strediskaLFNazov = new ArrayList<String>();
+        for (WebElement webElement : strediskaLF) {
+            strediskaLFNazov.add(webElement.getText().substring(7));
+        }
+
+        driver.quit();
+
+//        spustenie scrapera pre vsetky strediska
+
+        //toto je len na to, aby som vedel zacat odkial chcem
 //        {
-//            WebElement dropdown = driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlKrit1"));
-//            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//option[. = 'Pracovisko']")));
-//            dropdown.findElement(By.xpath("//option[. = 'Pracovisko']")).click();
-//        }
-//        wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
+//            strediskaLFNazov.remove(0);
 //
-//        //ulozenie atributov value stredisk FBERG do zoznamu
-//        driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")).click();
-//        List<WebElement> strediskaFBERG = driver.findElements(By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[position()>1]"));
-//        List<String> strediskaFBERGValues = new ArrayList<String>();
-//        for (WebElement webElement : strediskaFBERG) {
-//            strediskaFBERGValues.add(webElement.getAttribute("value"));
-//        }
-//
-//        //ulozenie atributov value stredisk LF do zoznamu
-//        driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlFakulta")).click();
-//        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlFakulta\"]/option[@value='09']")));
-//        driver.findElement(By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlFakulta\"]/option[@value='09']")).click();
-//        try {
-//            Thread.sleep(500);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//        //wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
-//        driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")).click();
-//        List<WebElement> strediskaLF = driver.findElements(By.xpath("//*[@id=\"ctl00_ContentPlaceHolderMain_ddlStredisko\"]/option[position()>1]"));
-//        List<String> strediskaLFValues = new ArrayList<String>();
-//        for (WebElement webElement : strediskaLF) {
-//            strediskaLFValues.add(webElement.getAttribute("value"));
-//        }
-//
-//        driver.quit();
-
-        //spustenie scrapera pre vsetky strediska
-//        for (String stredisko : strediskaFBERGValues) {
-//            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-//            zaznamyScraper.vybratPracovisko("01", stredisko);
-//            zaznamyScraper.scrape();
-//            zaznamyScraper.getDriver().quit();
-//            zaznamy.put(stredisko, zaznamyScraper.getData());
+//            ZaznamyScraper z = new ZaznamyScraper();
+//            z.vybratPracovisko("09", strediskaLFNazov.get(0));
+//            z.goToPage(13);
+//            z.scrape();
+//            z.getDriver().close();
+//            strediskaLFNazov.remove(0);
 //        }
 
-//        for (String stredisko : strediskaLFValues) {
+//        for (String stredisko : strediskaLFNazov) {
 //            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
 //            zaznamyScraper.vybratPracovisko("09", stredisko);
 //            zaznamyScraper.scrape();
-//            zaznamyScraper.getDriver().quit();
-//            zaznamy.put(stredisko, zaznamyScraper.getData());
+//            zaznamyScraper.getDriver().close();
 //        }
 
-//        Inserter.openConnection();
+        for (String stredisko : strediskaFBERGNazov) {
+            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+            zaznamyScraper.vybratPracovisko("01", stredisko);
+            zaznamyScraper.scrape();
+            zaznamyScraper.getDriver().close();
+        }
 
-        ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-//        zaznamyScraper.vybratPracovisko("01", "101001");
-        zaznamyScraper.vybratPracovisko("01", "Celá fakulta");
-        zaznamyScraper.goToPage(8);
-        zaznamyScraper.scrape();
+//        ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+////        zaznamyScraper.vybratPracovisko("01", "101001");
+//        zaznamyScraper.vybratPracovisko("09", "Dekanát LF");
+//        zaznamyScraper.goToPage(3);
+//        zaznamyScraper.scrape();
+
+
+
+        Database db = Database.getInstance();
+        db.closeConnection();
     }
 }
+
+

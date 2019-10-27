@@ -1,15 +1,26 @@
 package tabulky;
 
+import java.util.ArrayList;
+
 public class Ohlas {
+    private Integer ohlas_id = null;
     private Integer rok_vydania = null;
     private String nazov = null;
-    private String zbierka = null;
     private String strany = null;
     private String ISBN = null;
     private String ISSN = null;
     private String miesto_vydania = null;
-    private int dielo_id;
-    private int kategoria_ohlasu_id;
+    private Integer kategoria_ohlasu_id = null;
+
+    private ArrayList<Autor> autori = new ArrayList<Autor>();
+
+    public Integer getOhlas_id() {
+        return ohlas_id;
+    }
+
+    public void setOhlas_id(Integer ohlas_id) {
+        this.ohlas_id = ohlas_id;
+    }
 
     public Integer getRok_vydania() {
         return rok_vydania;
@@ -25,14 +36,6 @@ public class Ohlas {
 
     public void setNazov(String nazov) {
         this.nazov = nazov;
-    }
-
-    public String getZbierka() {
-        return zbierka;
-    }
-
-    public void setZbierka(String zbierka) {
-        this.zbierka = zbierka;
     }
 
     public String getStrany() {
@@ -67,19 +70,33 @@ public class Ohlas {
         this.miesto_vydania = miesto_vydania;
     }
 
-    public int getDielo_id() {
-        return dielo_id;
-    }
-
-    public void setDielo_id(int dielo_id) {
-        this.dielo_id = dielo_id;
-    }
-
-    public int getKategoria_ohlasu_id() {
+    public Integer getKategoria_ohlasu_id() {
         return kategoria_ohlasu_id;
     }
 
-    public void setKategoria_ohlasu_id(int kategoria_ohlasu_id) {
+    public void setKategoria_ohlasu_id(Integer kategoria_ohlasu_id) {
         this.kategoria_ohlasu_id = kategoria_ohlasu_id;
+    }
+
+    public ArrayList<Autor> getAutori() {
+        return autori;
+    }
+
+    public void setAutori(ArrayList<Autor> autori) {
+        this.autori = autori;
+    }
+
+    @Override
+    public String toString() {
+        return "Ohlas{" +
+                "ohlas_id=" + ohlas_id +
+                ", rok_vydania=" + rok_vydania +
+                ", nazov='" + nazov + '\'' +
+                ", strany='" + strany + '\'' +
+                ", ISBN='" + ISBN + '\'' +
+                ", ISSN='" + ISSN + '\'' +
+                ", miesto_vydania='" + miesto_vydania + '\'' +
+                ", kategoria_ohlasu_id=" + kategoria_ohlasu_id +
+                '}';
     }
 }

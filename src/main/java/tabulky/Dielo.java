@@ -1,6 +1,7 @@
 package tabulky;
 
 public class Dielo {
+    private Integer dielo_id = null;
     private String archivacne_cislo = null;
     private Integer rok_vydania = null;
     private String nazov = null;
@@ -13,6 +14,15 @@ public class Dielo {
     private String odkaz = null;
     private String strany = null;
     private String priloha = null;
+    private Integer kategoria_id = null;
+
+    public Integer getDielo_id() {
+        return dielo_id;
+    }
+
+    public void setDielo_id(Integer dielo_id) {
+        this.dielo_id = dielo_id;
+    }
 
     public String getArchivacne_cislo() {
         return archivacne_cislo;
@@ -108,5 +118,33 @@ public class Dielo {
 
     public void setPriloha(String priloha) {
         this.priloha = priloha;
+    }
+
+    public Integer getKategoria_id() {
+        return kategoria_id;
+    }
+
+    public void setKategoria_id(Integer kategoria_id) {
+        this.kategoria_id = kategoria_id;
+    }
+
+    @Override
+    public String toString() {
+        return "Dielo{" +
+                "dielo_id=" + dielo_id +
+                ", archivacne_cislo='" + archivacne_cislo + '\'' +
+                ", rok_vydania=" + rok_vydania +
+                ", nazov='" + nazov + '\'' +
+                ", podnazov='" + podnazov + '\'' +
+                ", vydanie='" + vydanie + '\'' +
+                ", ISBN='" + ISBN + '\'' +
+                ", ISSN='" + ISSN + '\'' +
+                ", miesto_vydania='" + miesto_vydania + '\'' +
+                ", klucove_slova='" + klucove_slova + '\'' +
+                ", odkaz='" + odkaz + '\'' +
+                ", strany='" + strany + '\'' +
+                ", priloha='" + priloha + '\'' +
+                ", kategoria_id=" + kategoria_id +
+                '}';
     }
 }

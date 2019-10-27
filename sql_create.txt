@@ -1,0 +1,117 @@
+CREATE TABLE Autori
+(
+	autor_id INT NOT NULL AUTO_INCREMENT,
+	meno VARCHAR(80),
+	priezvisko VARCHAR(80) NOT NULL,
+	PRIMARY KEY (autor_id)
+);
+
+CREATE TABLE Fakulty
+(
+	fakulta_id INT NOT NULL AUTO_INCREMENT,
+	nazov VARCHAR(200) NOT NULL,
+	skratka VARCHAR(10),
+	PRIMARY KEY (fakulta_id)
+);
+
+CREATE TABLE Skupiny
+(
+	skupina_id INT NOT NULL AUTO_INCREMENT,
+	kod VARCHAR(2) NOT NULL,
+	popis VARCHAR(500) NOT NULL,
+	PRIMARY KEY (skupina_id),
+	UNIQUE (kod)
+);
+
+CREATE TABLE Kategorie_ohlasov
+(
+	kategorie_ohlasov_id INT NOT NULL AUTO_INCREMENT,
+	kod INT NOT NULL,
+	popis VARCHAR(500) NOT NULL,
+	PRIMARY KEY (kategorie_ohlasov_id),
+	UNIQUE (kod)
+);
+
+CREATE TABLE Kategorie
+(
+	kategoria_id INT NOT NULL AUTO_INCREMENT,
+	kod VARCHAR(3) NOT NULL,
+	popis VARCHAR(500) NOT NULL,
+	skupina_id INT NOT NULL,
+	PRIMARY KEY (kategoria_id),
+	FOREIGN KEY (skupina_id) REFERENCES Skupiny(skupina_id),
+	UNIQUE (kod)
+);
+
+CREATE TABLE Pracoviska
+(
+	pracovisko_id INT NOT NULL AUTO_INCREMENT,
+	nazov VARCHAR(200) NOT NULL,
+	fakulta_id INT NOT NULL,
+	PRIMARY KEY (pracovisko_id),
+	FOREIGN KEY (fakulta_id) REFERENCES Fakulty(fakulta_id)
+);
+
+CREATE TABLE Diela
+(
+	dielo_id INT NOT NULL AUTO_INCREMENT,
+	archivacne_cislo VARCHAR(20) NOT NULL,
+	rok_vydania INT NOT NULL,
+	nazov VARCHAR(500) NOT NULL,
+	podnazov VARCHAR(500),
+	ISBN VARCHAR(40),
+	ISSN VARCHAR(9),
+	miesto_vydania VARCHAR(500),
+	klucove_slova VARCHAR(256),
+	odkaz VARCHAR(1000),
+	strany VARCHAR(20),
+	priloha VARCHAR(300),
+	kategoria_id INT NOT NULL,
+	PRIMARY KEY (dielo_id),
+	FOREIGN KEY (kategoria_id) REFERENCES Kategorie(kategoria_id),
+	UNIQUE (archivacne_cislo)
+);
+
+CREATE TABLE autor_dielo_pracovisko
+(
+	autor_id INT NOT NULL,
+	dielo_id INT NOT NULL,
+	pracovisko_id INT NOT NULL,
+	percentualny_podiel INT,
+	PRIMARY KEY (dielo_id, autor_id, pracovisko_id),
+	FOREIGN KEY (dielo_id) REFERENCES Diela(dielo_id),
+	FOREIGN KEY (autor_id) REFERENCES Autori(autor_id),
+	FOREIGN KEY (pracovisko_id) REFERENCES Pracoviska(pracovisko_id)
+);
+
+CREATE TABLE Ohlasy
+(
+	ohlas_id INT NOT NULL AUTO_INCREMENT,
+	rok_vydania INT NOT NULL,
+	nazov VARCHAR(500) NOT NULL,
+	ISBN VARCHAR(40),
+	ISSN VARCHAR(9),
+	miesto_vydania VARCHAR(500),
+	strany VARCHAR(20),
+	kategorie_ohlasov_id INT NOT NULL,
+	PRIMARY KEY (ohlas_id),
+	FOREIGN KEY (kategorie_ohlasov_id) REFERENCES Kategorie_ohlasov(kategorie_ohlasov_id)
+);
+
+CREATE TABLE dielo_ohlas
+(
+	dielo_id INT NOT NULL,
+	ohlas_id INT NOT NULL,
+	PRIMARY KEY (dielo_id, ohlas_id),
+	FOREIGN KEY (ohlas_id) REFERENCES Ohlasy(ohlas_id),
+	FOREIGN KEY (dielo_id) REFERENCES Diela(dielo_id)
+);
+
+CREATE TABLE autor_ohlas
+(
+	autor_id INT NOT NULL,
+	ohlas_id INT NOT NULL,
+	PRIMARY KEY (ohlas_id, autor_id),
+	FOREIGN KEY (ohlas_id) REFERENCES Ohlasy(ohlas_id),
+	FOREIGN KEY (autor_id) REFERENCES Autori(autor_id)
+);

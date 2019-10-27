@@ -1,3 +1,7 @@
+import org.openqa.selenium.By;
+import tabulky.Autor;
+import tabulky.Ohlas;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +31,7 @@ public class Tests {
 //        for(WebElement e : select.findElements(By.xpath("option"))){
 //            System.out.println(e.getText());
 //        }
+
         Pattern cisloP = Pattern.compile("[0-9]+");
         Pattern optickyDiskP = Pattern.compile("[0-9] elektronick[ýé](ch)? optický(ch)? disk(y|ov)? \\(CD-ROM\\)");
         Pattern sposobPristupuP = Pattern.compile(" *Spôsob prístupu: *");
@@ -44,113 +49,37 @@ public class Tests {
         Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
         Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$|\\[\\]");
 
-        //TODO - Košice : TU-FBERG - 2000. - 78, [2] s.. - ISBN 80-7099-634-X. WATAFAK????????????????????
+        Pattern autorOhlasuP = Pattern.compile("\\p{Lu}+, \\p{Lu}[^, :]+");
+        Pattern etalP = Pattern.compile("(et al\\.|\\[et al\\.\\]):?");
+        Pattern nazovOhlasuP = Pattern.compile("^((?=In:)|[^.])+"); //Od zaciatku riadku po slovo s velkym pismenom
 
-        //TODO strana 8 In: Environmentální vzdělávání. - Ostrava : VŠB-TU
-        //	Priloha: Rijeka : InTech  264 p.. - ISBN 9789533075020
-        String ostatne = "<p style=\"font-size: 11px\">\n" +
-                "                                <b>\n" +
-                "                                    <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_lZNazov\">TeZEK - Technológie znalostnej ekonomiky</span></b>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_LZNazovP\">/</span>\n" +
+        String ostatne = "                                <b>\n" +
+                "                                    <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl21_lZNazov\">Zem a zemské zdroje</span></b>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl21_LZNazovP\">/</span>\n" +
                 "                                \n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_lUdajZodpovednosti\">Jozef Bucko ... [et al.]</span>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_lZPokrBezUZ\"> - Košice : TU, - 2005. - 1 elektronický optický disk (CD-ROM). - ISBN 80-8073-319-8.</span>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl21_lUdajZodpovednosti\">Pavol Rybár, Tibor Sasvári</span>\n" +
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl21_lZPokrBezUZ\"> - 1. vyd - Košice : Štroffek, - 1998. - 175 s. - ISBN 80-88896-12-6.</span>\n" +
                 "                                \n" +
                 "                                  \n" +
                 "                               \n" +
                 "                                      \n" +
-                "                                   <a id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_HyperLink1\" target=\"_blank\"></a>\n" +
+                "                                   <a id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl21_HyperLink1\" target=\"_blank\"></a>\n" +
                 "                                \n" +
                 "                                \n" +
                 "                                <br>\n" +
-                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl23_lAut\">[BUCKO, Jozef - DELINA, Radoslav - GROHOĽ, Milan - HOROVČÁK, Pavel - LAVRIN, Anton - LEVICKÝ, Dušan - MIHÓK, Peter - ŠEVEC, Sergej - VODZINSKÝ, Vladimír - GRAJCÁROVÁ, Ľ. - ČIŽMÁRIKOVÁ, K. - ČIŽMÁRIK, M.]</span>\n" +
-                "                                \n" +
-                "                            </p>";
+                "                                <span id=\"ctl00_ContentPlaceHolderMain_gvVystupyByFilter_ctl21_lAut\">[RYBÁR, Pavol (50%) - SASVÁRI, Tibor (50%)]</span>\n" +
+                "                                <br> <br> 2005  [4] CEHLÁR, Michal, MIHOK, Jozef Bewertung der Mineralrohstofflagerstatten In: Bewertung der Mineralrohstofflagerstatten 173 s ISBN: 80-8073-482-8 " +
+                "<br> <br> 2007  [4] KUDELAS, D., RYBÁR, R.: Výskumno-vývojová činnosť Centra obnoviteľných zdrojov energií (COZE) ako príspevok k využívaniu energie vetra na Slovensku. In: Acta Montanistica Slovaca. Roč. 12, č. mimor. 2 (2007), s. 264-268. ISSN 1335-1788. " +
+                "<br> <br> 2007  [4] RYBÁR, R., KUDELAS, D.: Tradičné zdroje energie 1. Košice : ES AMS FBERG TU 2007. 119 s. ISBN 80-8073-799-3. " +
+                "<br> <br> 2006  [3] KUDELAS, D., RYBÁR, R., FISCHER, G.: Concept of accumulation system configuration enabling the usage of low-potential wind energy. In: Metalurgija. Vol. 45, no. 4 (2006), p. 299-302. ISSN 0543-5846. " +
+                "<br> <br> 2006  [3] KUDELAS, D., RYBÁR, R.: Posúdenie možnosti akumulačného spôsobu využitia veternej energie v centrálnej a južnej časti Košickej kotliny. In: Energetika. Roč. 56, č. 3 (2006), s. 98-101. ISSN 0375-8842. " +
+                "<br> <br> 2004  [4] RYBÁR, R., KUDELAS, D., FISCHER, G.: Alternatívne zdroje energie III. In: Veterná energia. Košice: Edičné stredisko/AMS, 2004. S. 99. ISBN 80-8073-144-6. " +
+                "<br> <br> 2006  [4] MIHOK, J., RYBÁR, R., CEHLÁR, M. et al: Trhaviny v krízových situáciách. Nitra: SPU, 2006. ISBN 80-8069-661-6. " +
+                "<br> <br> 2007  [3] MICHALÍKOVÁ, F. et al.: Vlastnosti hnedouhoľných popolčekov zo spaľovania uhlia v tepelnej elektrárni ENO Nováky. In: Recyklace odpadů 11 - 1: 6.-7.12.2007. Ostrava: VŠB-TU, 2007. p. 241-247. ISBN 978-80-248-1597-8." +
+                "<br> <br> 2005  [3] VOKOROKOS, Liberios: Parallel computer system utilization in geographic information systems. In: ICCC 2005. IEEE 3rd International Conference on Computational Cybernetics. Mauritius : April 13-16,2005. Budapest: Tech, 2005. P. 333-338. ISBN 963-7154-37-X.\n";
 
 
-        Matcher m;
-
-        ostatne = ostatne.replaceAll("\n", " ");
-        ostatne = ostatne.replaceAll(" {2,}", " ");
-        int i1 = ostatne.indexOf("ZPokrBezUZ")+12;
-        int i2 = ostatne.indexOf("<a");
-        ostatne = ostatne.substring(i1, i2);
-        ostatne = sposobPristupuP.matcher(ostatne).replaceAll("");
-
-        m = optickyDiskP.matcher(ostatne);
-        if (m.find()) {
-//            dielo.setPriloha(m.group(0));
-            ostatne = m.replaceAll("");
-        }
-
-        String[] ostatneArray = ostatne.split("</span>");
-        if (ostatneArray.length == 2) {
-            if (ostatneArray[1].length() <= 2) { //ked je za </span> nic nie je, pracujeme iba s castou pred </span> (cislo 2 je tam keby nahodou bolo za spanom napr. "2 s")
-                ostatne = ostatneArray[0];
-            } else {
-                if (ostatneArray[0].length() > 10) { //ak je pred </span> text dlhsi ako 10 pismen
-                    //je pripad kedy tu priloha nie je, ale su tu tie iste informacie ako za </span>
-                    ostatneArray[0] = rok1P.matcher(ostatneArray[0]).replaceAll(""); //rok1P pattern vymaze aj pomlcky okolo roku
-//                ostatneArray[0] = znakyNaStranachP.matcher(ostatneArray[0]).replaceAll("");
-                    System.out.println("ostatneArray[0]: "+ ostatneArray[0]);
-                }
-                ostatne = ostatneArray[1];
-                System.out.println("ostatneArray[1]: "+ ostatneArray[1]);
-            }
-        } else {
-            ostatne = ostatneArray[0];
-        }
-        ostatne = znakyNaStranachP.matcher(ostatne).replaceAll("");
-
-        m = ISBNP.matcher(ostatne);
-        if (m.find()) {
-//            dielo.setISBN(m.group(1));
-            ostatne = m.replaceAll("");
-        }
-
-        m = ISSNP.matcher(ostatne);
-        if (m.find()) {
-//            dielo.setISSN(m.group(1));
-            ostatne = m.replaceAll("");
-        }
-
-        m = stranyNeuvedeneP.matcher(ostatne);
-        if (!m.find()) { //ak nenajde nejaku variaciu p neuved tak bude kontrolovat ostatne normalne
-            m = strany1P.matcher(ostatne); //najprv sa najde vyraz strany1P kvoli pripadu ked rok nie je oddeleny nicim (okrem medzery) (2016 S. 109-114)
-            if (m.find()) {
-//                dielo.setStrany(m.group(0));
-            } else { //ak podla prveho vyrazu nic nenajde, skusi druhy vyraz
-                m = strany2P.matcher(ostatne);
-                if (m.find()) {
-//                    dielo.setStrany(m.group(0));
-                }
-            }
-        }
-        ostatne = m.replaceAll("");
-
-        m = vydanieP.matcher(ostatne);
-        if (m.find()) {
-//            dielo.setVydanie(m.group(2).replaceAll("\\[|\\]", ""));
-            ostatne = m.replaceAll("");
-        }
-
-//        Pattern miesto_vydania1P = Pattern.compile("In:(- )?[A-Z][^:\n]+: [a-zA-Z ,]+(, -| -)");
-//        m = miesto_vydania1P.matcher(ostatne);
-//        if (m.find()) {
-//            String miesto_vydania = m.group(0);
-//            dielo.setMiesto_vydania(miesto_vydania);
-//            ostatne = m.replaceAll("");
-//        }
-
-        //TODO zacykluje sa
-        m = znakyNaStranachP.matcher(ostatne);
-        while (m.find()) {
-            ostatne = m.replaceAll("");
-            ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
-            m = znakyNaStranachP.matcher(ostatne);
-        }
-
-//        dielo.setMiesto_vydania(ostatne);
-        System.out.println(ostatne);
+        int currentPage = 3;
+        System.out.println("Strana "+ (currentPage+1) +" neexistuje.");
     }
 }
