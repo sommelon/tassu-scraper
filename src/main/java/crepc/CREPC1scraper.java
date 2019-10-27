@@ -59,7 +59,11 @@ public class CREPC1scraper {
         driver.findElement(By.xpath("//*[@id=\"googleedit\"]")).sendKeys(recordNameForSearch);
         driver.findElement(By.xpath("//*[@id=\"googleedit\"]")).sendKeys(Keys.RETURN);
         //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"divChck_1\"]/div[3]/a")));
-        if(driver.findElements(By.xpath("//*[contains(@id, 'divChck')]")).size()==1) {
+            if(driver.findElements(By.xpath("//*[contains(@id, 'divChck')]")).size()==0) {
+                insertToDatabaseEmtpy();
+            }
+
+            if(driver.findElements(By.xpath("//*[contains(@id, 'divChck')]")).size()==1) {
             String pageRecordName = driver.findElement(By.xpath("//*[@id=\"divChck_1\"]/div[2]/b")).getText();
             while (pageRecordName.endsWith(" ")){
                 recordName = recordname.substring(0, recordName.length()-1);
@@ -101,9 +105,6 @@ public class CREPC1scraper {
 
             }
         }
-            if(driver.findElements(By.xpath("//*[contains(@id, 'divChck')]")).size()>1) {
-                insertToDatabaseEmtpy();
-            }
 
 
             }
@@ -152,10 +153,10 @@ public class CREPC1scraper {
                         sb.append(s);
                         sb.append(", ");
                     }
-                    dieloId = resultset.getInt("zaznam_id");
-                    String query = "insert into dielo.klucove_slova values (?) where zaznam_id = " + dieloId;
-                    String sql = "UPDATE dielo " +
-                            "SET klucove_slova = " + "'" + sb.toString() + "'" + " WHERE zaznam_id=" + dieloId;
+                    dieloId = resultset.getInt("dielo_id");
+                    String query = "insert into diela.klucove_slova values (?) where dielo_id = " + dieloId;
+                    String sql = "UPDATE diela " +
+                            "SET klucove_slova = " + "'" + sb.toString() + "'" + " WHERE dielo_id=" + dieloId;
                     try {
                         try {
                             con = DriverManager.getConnection(url, user, pass);
@@ -186,10 +187,10 @@ public class CREPC1scraper {
             while (resultset.next()) {
                 if (resultset.getString("nazov").equalsIgnoreCase(recordname)|| resultset.getString("nazov").equalsIgnoreCase(recordname + " ")){
 
-                    dieloId = resultset.getInt("zaznam_id");
-                    String query = "insert into dielo.klucove_slova values (?) where zaznam_id = " + dieloId;
-                    String sql = "UPDATE dielo " +
-                            "SET klucove_slova = " + "'" +"---" + "'" + " WHERE zaznam_id=" + dieloId;
+                    dieloId = resultset.getInt("dielo_id");
+                    String query = "insert into diela.klucove_slova values (?) where dielo_id = " + dieloId;
+                    String sql = "UPDATE diela " +
+                            "SET klucove_slova = " + "'" +"---" + "'" + " WHERE dielo_id=" + dieloId;
                     try {
                         try {
                             con = DriverManager.getConnection(url, user, pass);
@@ -228,7 +229,7 @@ public class CREPC1scraper {
             con = DriverManager.getConnection(host, uName, uPass);
 
             Statement stat = con.createStatement();
-            return stat.executeQuery("SELECT * FROM dielo");
+            return stat.executeQuery("SELECT * FROM diela");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
