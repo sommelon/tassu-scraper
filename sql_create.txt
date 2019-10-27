@@ -1,7 +1,7 @@
 CREATE TABLE Autori
 (
 	autor_id INT NOT NULL AUTO_INCREMENT,
-	meno VARCHAR(80) NOT NULL,
+	meno VARCHAR(80),
 	priezvisko VARCHAR(80) NOT NULL,
 	PRIMARY KEY (autor_id)
 );
@@ -59,7 +59,7 @@ CREATE TABLE Diela
 	rok_vydania INT NOT NULL,
 	nazov VARCHAR(500) NOT NULL,
 	podnazov VARCHAR(500),
-	ISBN VARCHAR(25),
+	ISBN VARCHAR(40),
 	ISSN VARCHAR(9),
 	miesto_vydania VARCHAR(500),
 	klucove_slova VARCHAR(256),
@@ -89,7 +89,7 @@ CREATE TABLE Ohlasy
 	ohlas_id INT NOT NULL AUTO_INCREMENT,
 	rok_vydania INT NOT NULL,
 	nazov VARCHAR(500) NOT NULL,
-	ISBN VARCHAR(20),
+	ISBN VARCHAR(40),
 	ISSN VARCHAR(9),
 	miesto_vydania VARCHAR(500),
 	strany VARCHAR(20),
