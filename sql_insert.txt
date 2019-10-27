@@ -73,7 +73,12 @@ VALUES
 (57,"EDJ" , "Prehľadové práce, odborné preklady v časopisoch a zborníkoch", 6),
 (58,"GAI" , "Výskumné štúdie a priebežné správy", 6),
 (59,"GHG" , "Práce zverejnené na internete", 6),
-(60,"GII" , "Rôzne publikácie a dokumenty, ktoré nemožno zaradiť do žiadnej z predchádzajúcich kategórií", 6);
+(60,"GII" , "Rôzne publikácie a dokumenty, ktoré nemožno zaradiť do žiadnej z predchádzajúcich kategórií", 6),
+(61,"EAI" , "Prehľadové práce - knižné", 2),
+
+(62,"BDM" , "Prehľadové práce - knižné", 5),
+
+(63,"BGG" , "štandardy, normy ", 6);
 
 INSERT into fakulty (fakulta_id, nazov, skratka)
 VALUES
