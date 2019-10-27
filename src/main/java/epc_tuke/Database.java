@@ -22,7 +22,7 @@ public class Database {
     private String iOhlas = "insert into ohlasy (rok_vydania, nazov, ISBN, ISSN, miesto_vydania, strany, kategorie_ohlasov_id) values (?,?,?,?,?,?,?)";
     private String iAutorOhlas = "insert into autor_ohlas (autor_id, ohlas_id) values (?,?)";
     private String sOhlas = "select ohlas_id from ohlasy where nazov = ? and rok_vydania = ?";
-    private String sAutorIdAPodiel = "select autor_id, percentualny_podiel from autor_dielo_pracovisko where dielo_id = ?";
+    private String sAutorIdAPodielAPracovisko = "select autor_id, percentualny_podiel, pracovisko_id from autor_dielo_pracovisko where dielo_id = ?";
     private String iAutorDieloPracovisko = "insert into autor_dielo_pracovisko (autor_id, dielo_id, pracovisko_id, percentualny_podiel) values (?,?,?,?)";
 
     private Statement stKategorie;
@@ -35,7 +35,7 @@ public class Database {
     private PreparedStatement psOhlas;
     private PreparedStatement psOhlasSelect;
     private PreparedStatement psAutorOhlas;
-    private PreparedStatement psAutorIdAPodielByDielo;
+    private PreparedStatement psAutorIdAPodielAPracoviskoByDielo;
     private PreparedStatement psAutorDieloPracovisko;
 
     private Hashtable<String, Integer> kategorie = new Hashtable<String, Integer>();
@@ -79,7 +79,7 @@ public class Database {
                 psOhlas = con.prepareStatement(iOhlas, Statement.RETURN_GENERATED_KEYS);
                 psAutorOhlas = con.prepareStatement(iAutorOhlas);
                 psOhlasSelect = con.prepareStatement(sOhlas);
-                psAutorIdAPodielByDielo = con.prepareStatement(sAutorIdAPodiel);
+                psAutorIdAPodielAPracoviskoByDielo = con.prepareStatement(sAutorIdAPodielAPracovisko);
                 psAutorDieloPracovisko = con.prepareStatement(iAutorDieloPracovisko);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -103,7 +103,7 @@ public class Database {
             psOhlas.close();
             psAutorOhlas.close();
             psOhlasSelect.close();
-            psAutorIdAPodielByDielo.close();
+            psAutorIdAPodielAPracoviskoByDielo.close();
             psAutorDieloPracovisko.close();
             if (con != null)
                 con.close();
@@ -203,12 +203,12 @@ public class Database {
         }
     }
 
-    public ResultSet selectAutorIdAPodielByDielo(Integer dielo_id){
+    public ResultSet selectAutorIdAPodielAPracoviskoByDielo(Integer dielo_id){
         ResultSet rs = null;
 
         try {
-            psAutorIdAPodielByDielo.setInt(1, dielo_id);
-            rs = psAutorIdAPodielByDielo.executeQuery();
+            psAutorIdAPodielAPracoviskoByDielo.setInt(1, dielo_id);
+            rs = psAutorIdAPodielAPracoviskoByDielo.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
         }

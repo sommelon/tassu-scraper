@@ -14,6 +14,8 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
+        Database db = Database.getInstance();
+
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
         ChromeOptions options = new ChromeOptions();
 //        options.addArguments("headless");
@@ -58,21 +60,16 @@ public class Main {
 //        spustenie scrapera pre vsetky strediska
 
         //toto je len na to, aby som vedel zacat odkial chcem
-//        {
-//            strediskaLFNazov.remove(0);
-//            strediskaLFNazov.remove(0);
-//            strediskaLFNazov.remove(0);
-//            strediskaLFNazov.remove(0);
-//            strediskaLFNazov.remove(0);
-//            strediskaLFNazov.remove(0);
-//
-//            ZaznamyScraper z = new ZaznamyScraper();
-//            z.vybratPracovisko("09", strediskaLFNazov.get(0));
-//            z.goToPage(13);
-//            z.scrape();
-//            z.getDriver().close();
-//            strediskaLFNazov.remove(0);
-//        }
+        {
+            strediskaFBERGNazov.subList(0, 3).clear();
+
+            ZaznamyScraper z = new ZaznamyScraper();
+            z.vybratPracovisko("01", strediskaFBERGNazov.get(0));
+            z.goToPage(9);
+            z.scrape();
+            z.getDriver().close();
+            strediskaFBERGNazov.remove(0);
+        }
 
 //        for (String stredisko : strediskaLFNazov) {
 //            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
@@ -96,7 +93,7 @@ public class Main {
 
 
 
-        Database db = Database.getInstance();
+
         db.closeConnection();
     }
 }

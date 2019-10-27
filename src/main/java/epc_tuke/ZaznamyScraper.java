@@ -36,15 +36,16 @@ public class ZaznamyScraper {
     private Pattern hranateZatvorkyP = Pattern.compile("\\[|\\]");
     private Pattern optickyDiskP = Pattern.compile("[0-9] elektronick[ýé](ch)? optický(ch)? disk(y|ov)? \\(CD-ROM\\)");
     private Pattern sposobPristupuP = Pattern.compile(" *Spôsob prístupu: *");
-    private Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+X?)");
-    private Pattern ISSNP = Pattern.compile("ISSN:? ?([0-9]{4}-[0-9]{3}[0-9xX])");
-//    private Pattern rokP = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( -| |\n)");
+    private Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+[xX]?)");
+//    private Pattern ISSNP = Pattern.compile("ISSN:? ?([0-9]{4}( | - |-)?[0-9]{3}[0-9xX])");
+    private Pattern ISSNP = Pattern.compile("ISSN:? ?([\\- 0-9]+[xX]?)"); //ZLY FORMAT, ale neviem co robit s takymi udajmi, tak ich proste dam do DB tak jak su tam
+    //    private Pattern rokP = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( -| |\n)");
 //    private Pattern rok1P = Pattern.compile("(- |\\(| )?(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
     private Pattern rokNaKonciP = Pattern.compile("[,\\- ]?\\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
-    private Pattern cisloNaKonciP = Pattern.compile("- [\\(\\[]?[0-9][\\)\\]]? *$"); //rok na konci riadku - mal by byt na konci miesta vydania
+    private Pattern cisloNaKonciP = Pattern.compile("- [\\(\\[]?[0-9][\\)\\]]? *$"); //cislo na konci riadku po pomlcke nema vyznam '- 78'
     private Pattern stranyNeuvedeneP = Pattern.compile("([SPsp]\\.? neuved[^ \\-\n]?)|(neuved[^ \\-\n]? [SPsp]\\.?)");
     private Pattern strany1P = Pattern.compile(" [PSps]\\.?\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])"); //strany aj s poznamkou v hranatych zatvorkach
-    private Pattern strany2P = Pattern.compile(" ([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?\\.?");// 86 p [CD-ROM]; [86] p; 86 p
+    private Pattern strany2P = Pattern.compile(" ([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?\\.?");// 86 p, [86] p
     private Pattern prilohaP = Pattern.compile("( \\[[\\p{L} :\\-]+\\])+"); //[CD-ROM] [USB kluc]
     private Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? ?[^-]*)-");
     private Pattern podielP = Pattern.compile("[0-9]{1,3}");
@@ -307,14 +308,20 @@ public class ZaznamyScraper {
                 autori.add(autor);
             }
 
-            nahratDoDB(dielo, autori, ohlasy, podiely);
+            try {
+                nahratDoDB(dielo, autori, ohlasy, podiely);
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
 
-        } else { //ak dielo uz je v tabulke, urobi sa zaznam s novym pracoviskom v tabulke autor_dielo_pracovisko
+        } else { //ak dielo uz je v databaze, urobi sa zaznam s novym pracoviskom v tabulke autor_dielo_pracovisko
             int dieloID = rs.getInt(1);
-            rs = db.selectAutorIdAPodielByDielo(dieloID);
+            rs = db.selectAutorIdAPodielAPracoviskoByDielo(dieloID);
             ArrayList<Integer> autorIDs = new ArrayList<Integer>();
             ArrayList<Integer> podiely = new ArrayList<Integer>();
             while (rs.next()){
+                if (rs.getInt(3) == pracoviskoID) //ak uz je dielo v tomto pracovisku
+                    return;
                 autorIDs.add(rs.getInt(1));
                 podiely.add(rs.getInt(2));
             }
@@ -364,7 +371,7 @@ public class ZaznamyScraper {
                 db.insertIntoDieloOhlas(dielo.getDielo_id(), ohlas.getOhlas_id());
             }
 
-            System.out.println("\t\t"+ ohlas);
+            System.out.println("\t"+ ohlas);
         }
     }
 
