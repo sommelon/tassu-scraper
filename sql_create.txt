@@ -79,7 +79,7 @@ CREATE TABLE autor_dielo_pracovisko
 	pracovisko_id INT NOT NULL,
 	percentualny_podiel INT,
 	PRIMARY KEY (dielo_id, autor_id, pracovisko_id),
-	FOREIGN KEY (dielo_id) REFERENCES Dielo(dielo_id),
+	FOREIGN KEY (dielo_id) REFERENCES Diela(dielo_id),
 	FOREIGN KEY (autor_id) REFERENCES Autori(autor_id),
 	FOREIGN KEY (pracovisko_id) REFERENCES Pracoviska(pracovisko_id)
 );
