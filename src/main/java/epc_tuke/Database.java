@@ -16,19 +16,25 @@ public class Database {
     private String iDielo = "insert into diela " +
             "(archivacne_cislo, rok_vydania, nazov, podnazov,ISBN, ISSN, miesto_vydania, klucove_slova, odkaz, strany, priloha, kategoria_id) " +
             "values (?,?,?,?,?,?,?,?,?,?,?,?)";
+    private String iDieloOhlas = "insert into dielo_ohlas (dielo_id, ohlas_id) values (?,?)";
     private String iAutor = "insert into autori (meno, priezvisko) values (?,?)";
     private String sAutor = "select autor_id from autori where meno = ? and priezvisko = ?";
-    private String sOhlas = "insert into ohlasy (ohlas_id, nazov, dielo_id) values (?,?,?)";
+    private String iOhlas = "insert into ohlasy (rok_vydania, nazov, ISBN, ISSN, miesto_vydania, strany, kategorie_ohlasov_id) values (?,?,?,?,?,?,?)";
+    private String iAutorOhlas = "insert into autor_ohlas (autor_id, ohlas_id) values (?,?)";
+    private String sOhlas = "select ohlas_id from ohlasy where nazov = ?";
     private String sAutorIdAPodiel = "select autor_id, percentualny_podiel from autor_dielo_pracovisko where dielo_id = ?";
     private String iAutorDieloPracovisko = "insert into autor_dielo_pracovisko (autor_id, dielo_id, pracovisko_id, percentualny_podiel) values (?,?,?,?)";
 
-    private Statement sKategorie;
-    private Statement sPracoviska;
+    private Statement stKategorie;
+    private Statement stPracoviska;
     private PreparedStatement psDielo;
+    private PreparedStatement psDieloOhlas;
     private PreparedStatement psDieloSelect;
     private PreparedStatement psAutorSelect;
     private PreparedStatement psAutorInsert;
     private PreparedStatement psOhlas;
+    private PreparedStatement psOhlasSelect;
+    private PreparedStatement psAutorOhlas;
     private PreparedStatement psAutorIdAPodielByDielo;
     private PreparedStatement psAutorDieloPracovisko;
 
@@ -56,13 +62,16 @@ public class Database {
 
             try {
                 con = DriverManager.getConnection(url, user, pass);
-                sKategorie = con.createStatement();
-                sPracoviska = con.createStatement();
+                stKategorie = con.createStatement();
+                stPracoviska = con.createStatement();
                 psDielo = con.prepareStatement(iDielo, Statement.RETURN_GENERATED_KEYS);
+                psDieloOhlas = con.prepareStatement(iDieloOhlas, Statement.RETURN_GENERATED_KEYS);
                 psDieloSelect = con.prepareStatement(sDielo);
                 psAutorSelect = con.prepareStatement(sAutor);
                 psAutorInsert = con.prepareStatement(iAutor, Statement.RETURN_GENERATED_KEYS);
-                psOhlas = con.prepareStatement(sOhlas);
+                psOhlas = con.prepareStatement(iOhlas, Statement.RETURN_GENERATED_KEYS);
+                psAutorOhlas = con.prepareStatement(iAutorOhlas);
+                psOhlasSelect = con.prepareStatement(sOhlas);
                 psAutorIdAPodielByDielo = con.prepareStatement(sAutorIdAPodiel);
                 psAutorDieloPracovisko = con.prepareStatement(iAutorDieloPracovisko);
             } catch (SQLException e) {
@@ -77,12 +86,16 @@ public class Database {
 
     public void closeConnection(){
         try {
-            sKategorie.close();
-            sPracoviska.close();
+            stKategorie.close();
+            stPracoviska.close();
             psDielo.close();
+            psDieloOhlas.close();
+            psDieloSelect.close();
             psAutorInsert.close();
             psAutorSelect.close();
             psOhlas.close();
+            psAutorOhlas.close();
+            psOhlasSelect.close();
             psAutorIdAPodielByDielo.close();
             psAutorDieloPracovisko.close();
             if (con != null)
@@ -103,7 +116,7 @@ public class Database {
         return rs;
     }
 
-    public ResultSet insertIntoDielo(Dielo dielo) {
+    public ResultSet insertIntoDiela(Dielo dielo) {
         ResultSet rs = null;
         try {
             psDielo.setString(1, dielo.getArchivacne_cislo());
@@ -130,7 +143,18 @@ public class Database {
         return rs;
     }
 
-    public ResultSet insertIntoAutor(Autor autor){
+    public void insertIntoDieloOhlas(Integer dielo_id, Integer ohlas_id){
+        try {
+            psDieloOhlas.setInt(1, dielo_id);
+            psDieloOhlas.setInt(2, ohlas_id);
+
+            psDieloOhlas.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ResultSet insertIntoAutori(Autor autor){
         ResultSet rs = null;
         try {
             psAutorSelect.setString(1, autor.getMeno());
@@ -185,17 +209,46 @@ public class Database {
         }
     }
 
-    public void insertIntoOhlas(Ohlas ohlas){
+    public void insertIntoAutorOhlas(Integer autor_id, Integer ohlas_id){
         try {
-            psOhlas.setString(1, ohlas.getNazov());
-            psOhlas.setInt(2, ohlas.getDielo_id());
+            psAutorOhlas.setInt(1, autor_id);
+            psAutorOhlas.setInt(2, ohlas_id);
 
-            psOhlas.executeUpdate();
+            psAutorOhlas.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } catch (NullPointerException e){
+        }
+    }
+
+    public ResultSet selectOhlas(String nazov){
+        ResultSet rs = null;
+        try {
+            psOhlasSelect.setString(1, nazov);
+            rs = psOhlasSelect.executeQuery();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+        return rs;
+    }
+
+    public ResultSet insertIntoOhlasy(Ohlas ohlas){
+        ResultSet rs = null;
+
+        try {
+            psOhlas.setInt(1, ohlas.getRok_vydania());
+            psOhlas.setString(2, ohlas.getNazov());
+            psOhlas.setString(3, ohlas.getISBN());
+            psOhlas.setString(4, ohlas.getISSN());
+            psOhlas.setString(5, ohlas.getMiesto_vydania());
+            psOhlas.setString(6, ohlas.getStrany());
+            psOhlas.setInt(7, ohlas.getKategoria_ohlasu_id());
+
+            psOhlas.executeUpdate();
+            rs = psOhlas.getGeneratedKeys();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rs;
     }
 
     private void selectKategorie(){
@@ -203,7 +256,7 @@ public class Database {
         ResultSet rs;
 
         try {
-            rs = sKategorie.executeQuery(query);
+            rs = stKategorie.executeQuery(query);
             while(rs.next()){
                 kategorie.put(rs.getString(1), rs.getInt(2));
             }
@@ -217,7 +270,7 @@ public class Database {
         ResultSet rs;
 
         try {
-            rs = sPracoviska.executeQuery(query);
+            rs = stPracoviska.executeQuery(query);
             while(rs.next()){
                 pracoviska.put(rs.getString(1), rs.getInt(2));
             }

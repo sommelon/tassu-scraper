@@ -39,7 +39,7 @@ public class ZaznamyScraper {
     private Pattern ISBNP = Pattern.compile("ISBN:? ?([\\- 0-9]+X?)");
     private Pattern ISSNP = Pattern.compile("ISSN:? ?([0-9]{4}-[0-9]{3}[0-9xX])");
 //    private Pattern rokP = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( -| |\n)");
-    private Pattern rok1P = Pattern.compile("(- |\\(| )?(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
+//    private Pattern rok1P = Pattern.compile("(- |\\(| )?(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
     private Pattern rokNaKonciP = Pattern.compile("[,\\- ]?\\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
     private Pattern cisloNaKonciP = Pattern.compile("- [\\(\\[]?[0-9][\\)\\]]? *$"); //rok na konci riadku - mal by byt na konci miesta vydania
     private Pattern stranyNeuvedeneP = Pattern.compile("([SPsp]\\.? neuved[^ \\-\n]?)|(neuved[^ \\-\n]? [SPsp]\\.?)");
@@ -52,7 +52,7 @@ public class ZaznamyScraper {
     private Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$|\\[\\]");
     private Pattern autorOhlasuP = Pattern.compile("\\p{Lu}+, \\p{Lu}[^, :]+");
     private Pattern etalP = Pattern.compile("(et al\\.|\\[et al\\.\\]):?");
-    private Pattern nazovOhlasuP = Pattern.compile("^((?=In:)|[^.])+"); //Od zaciatku riadku po slovo s velkym pismenom
+    private Pattern nazovOhlasuP = Pattern.compile("^((?=In:)|[^.])+"); //od zaciatku riadku po In: alebo po bodku - pravdepodobne to niekde matchne zle
 
     public ZaznamyScraper() {
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
@@ -140,18 +140,20 @@ public class ZaznamyScraper {
         nextPage();
     }
 
+    //Prepne na dalsiu stranu
     private void nextPage() {
         try {
             goToPage(currentPage+1);
             scrape();
         } catch (NoSuchPageException e){
-            System.out.println(ANSI_RED+ "Strana "+ currentPage +" neexistuje." +ANSI_RESET);
+            System.out.println(ANSI_RED+ "Strana "+ currentPage+1 +" neexistuje." +ANSI_RESET);
         }
     }
 
+    //Prepne na specificku stranu
     public void goToPage(int page){
         if (page < 1 || page > maxPages)
-            throw new NoSuchPageException("Strana neexistuje.");
+            throw new NoSuchPageException();
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("__doPostBack('ctl00$ContentPlaceHolderMain$gvVystupyByFilter','Page$"+page+"')");
@@ -165,6 +167,7 @@ public class ZaznamyScraper {
         System.out.println(ANSI_BLUE+ "Strana " + currentPage +ANSI_RESET);
     }
 
+    //Parsuje data z WebElementu, ktory reprezentuje riadok tabulky
     private void exctractDataFromTableRow(WebElement riadokTabulky) throws SQLException {
         Matcher m;
         ResultSet rs;
@@ -253,13 +256,7 @@ public class ZaznamyScraper {
 //            ostatne = m.replaceAll("");
 //        }
 
-            m = znakyNaStranachP.matcher(ostatne);
-            while (m.find()) {
-                ostatne = m.replaceAll("");
-                ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
-                ostatne = cisloNaKonciP.matcher(ostatne).replaceAll("");
-                m = znakyNaStranachP.matcher(ostatne);
-            }
+            ostatne = odstranitZnakyARokyNaStranach(ostatne);
 
             dielo.setMiesto_vydania(ostatne);
             System.out.println(dielo);
@@ -303,20 +300,8 @@ public class ZaznamyScraper {
                 autori.add(autor);
             }
 
-            rs = db.insertIntoDielo(dielo);
-            dielo.setDielo_id(rs.getInt(1));
+            nahratDoDB(dielo, autori, ohlasy, podiely);
 
-            for (Autor autor : autori) {
-                rs = db.insertIntoAutor(autor);
-                if(rs.next())
-                    autor.setAutor_id(rs.getInt(1));
-            }
-
-            for (Ohlas ohlas : ohlasy) {
-
-            }
-
-            //TODO nahrat do databazy
         } else { //ak dielo uz je v tabulke, urobi sa zaznam s novym pracoviskom v tabulke autor_dielo_pracovisko
             int dieloID = rs.getInt(1);
             rs = db.selectAutorIdAPodielByDielo(dieloID);
@@ -330,6 +315,44 @@ public class ZaznamyScraper {
             for (int i = 0; i < autorIDs.size(); i++) {
                 db.insertIntoAutorDieloPracovisko(autorIDs.get(i), dieloID, pracoviskoID, podiely.get(i));
             }
+        }
+    }
+
+    private void nahratDoDB(Dielo dielo, ArrayList<Autor> autori, ArrayList<Ohlas> ohlasy, ArrayList<Integer> podiely) throws SQLException {
+        ResultSet rs;
+        rs = db.insertIntoDiela(dielo);
+        dielo.setDielo_id(rs.getInt(1));
+
+        for (Autor autor : autori) {
+            rs = db.insertIntoAutori(autor);
+            if(rs.next())
+                autor.setAutor_id(rs.getInt(1));
+        }
+
+        for (int i = 0; i < autori.size(); i++) {
+            db.insertIntoAutorDieloPracovisko(autori.get(i).getAutor_id(), dielo.getDielo_id(), pracoviskoID, podiely.get(i));
+        }
+
+        for (Ohlas ohlas : ohlasy) {
+            rs = db.selectOhlas(ohlas.getNazov());
+            if (!rs.next()) { //ak ohlas este nie je v databaze, vlozi sa tam
+                rs = db.insertIntoOhlasy(ohlas);
+                ohlas.setOhlas_id(rs.getInt(1));
+
+                for (Autor autor : ohlas.getAutori()) {
+                    rs = db.insertIntoAutori(autor);
+                    if(rs.next())
+                        autor.setAutor_id(rs.getInt(1));
+                }
+
+                for (int i = 0; i < ohlas.getAutori().size(); i++) {
+                    db.insertIntoAutorOhlas(ohlas.getAutori().get(i).getAutor_id(), ohlas.getOhlas_id());
+                }
+            }else {
+                ohlas.setOhlas_id(rs.getInt(1));
+            }
+
+            db.insertIntoDieloOhlas(dielo.getDielo_id(), ohlas.getOhlas_id());
         }
     }
 
@@ -385,6 +408,7 @@ public class ZaznamyScraper {
                     autor.setPriezvisko(priezvisko);
                     autor.setMeno(meno);
                 }
+                ohlas.getAutori().add(autor);
             }
 
             ostatne = mo.replaceAll("");
@@ -399,13 +423,7 @@ public class ZaznamyScraper {
                 System.err.println("Nazov ohlasu sa nenasiel.");
             }
 
-            mo = znakyNaStranachP.matcher(ostatne);
-            while (mo.find()) {
-                ostatne = mo.replaceAll("");
-                ostatne = rokNaKonciP.matcher(ostatne).replaceAll("");
-                ostatne = cisloNaKonciP.matcher(ostatne).replaceAll("");
-                mo = znakyNaStranachP.matcher(ostatne);
-            }
+            ostatne = odstranitZnakyARokyNaStranach(ostatne);
 
             ohlas.setMiesto_vydania(ostatne);
 
@@ -414,6 +432,18 @@ public class ZaznamyScraper {
         }
 
         return ohlasy;
+    }
+
+    private String odstranitZnakyARokyNaStranach (String s){
+        Matcher m;
+        m = znakyNaStranachP.matcher(s);
+        while (m.find()) {
+            s = m.replaceAll("");
+            s = rokNaKonciP.matcher(s).replaceAll("");
+            s = cisloNaKonciP.matcher(s).replaceAll("");
+            m = znakyNaStranachP.matcher(s);
+        }
+        return s;
     }
 
     private void checkCheckboxesAndSearch(){
