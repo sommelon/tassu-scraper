@@ -93,11 +93,18 @@ CREATE TABLE Ohlasy
 	ISSN VARCHAR(9),
 	miesto_vydania VARCHAR(100),
 	strany VARCHAR(20),
-	dielo_id INT NOT NULL,
 	kategorie_ohlasov_id INT NOT NULL,
 	PRIMARY KEY (ohlas_id),
-	FOREIGN KEY (dielo_id) REFERENCES Dielo(dielo_id),
 	FOREIGN KEY (kategorie_ohlasov_id) REFERENCES Kategorie_ohlasov(kategorie_ohlasov_id)
+);
+
+CREATE TABLE dielo_ohlas
+(
+	dielo_id INT NOT NULL,
+	ohlas_id INT NOT NULL,
+	PRIMARY KEY (dielo_id, ohlas_id),
+	FOREIGN KEY (ohlas_id) REFERENCES Ohlasy(ohlas_id),
+	FOREIGN KEY (dielo_id) REFERENCES Diela(dielo_id)
 );
 
 CREATE TABLE autor_ohlas
