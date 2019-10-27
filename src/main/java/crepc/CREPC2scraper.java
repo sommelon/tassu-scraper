@@ -43,6 +43,9 @@ public class CREPC2scraper {
             e.printStackTrace();
         }
     }
+    public void close(){
+        driver.close();
+    }
     public void searchForRecordKeyword(String recordName, String isbn){
         this.recordname = recordName;
         while (recordName.endsWith(" ")){
@@ -90,33 +93,10 @@ public class CREPC2scraper {
                     sb.append(e + ", ");
                 }
 
-      /*  if(driver.findElements(By.xpath("//a[@class='btn btn-default text-wrap']div[@class='col-sm-12'][contains(.,'" + isbn + "')]")).size()>0) {driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName +  "\")][contains(.,'Kľúčové slová')]")).get(0).findElements(By.cssSelector(".btn.btn-default.text-wrap"))
-            if (wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']"))).size() > 0) {
-                ord = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']")));
-                elementsSize = ord.size();
-                //wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@class='btn btn-default text-wrap']")));
-            }
-            for (int i = 0; i < elementsSize; i++) {
-                elementsString.add(wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//a[@class='btn btn-default text-wrap']"))).get(i).getText());
-            }
-            StringBuilder sb = new StringBuilder();
-            for (String e : elementsString) {
-                sb.append(e + ", ");
-            }
-
-      */
-
-
-
-       /* if(sb.toString().endsWith(",")){
-            sb.substring(0,sb.length()-1);
-        }*/
-
-                // driver.findElements(By.xpath("//[@class='col-sm-12'][contains(.,'" + isbn + "')]"));
 
                 insertToDatabase(sb.toString());
             }
-            if (driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).size() > 0) {
+            if (driver.findElements(By.xpath("//div[@class='col-sm-12'][contains(.,'" + isbn + "')][contains(.,\"" + recordName + "\")][contains(.,'Kľúčové slová')]")).size() == 0) {
             insertToDatabaseEmtpy();
             }
             }
@@ -140,9 +120,9 @@ public class CREPC2scraper {
 //                        sb.append(s);
 //                        sb.append(", ");
 //                    }
-                    dieloId = resultset.getInt("zaznam_id");
-                    String query = "insert into dielo.klucove_slova values (?) where zaznam_id = " + dieloId;
-                    String sql = "UPDATE dielo SET klucove_slova = ? WHERE zaznam_id= ?";
+                    dieloId = resultset.getInt("dielo_id");
+                    String query = "insert into diela.klucove_slova values (?) where dielo_id = " + dieloId;
+                    String sql = "UPDATE diela SET klucove_slova = ? WHERE dielo_id= ?";
 
                     try {
 
@@ -173,10 +153,10 @@ public class CREPC2scraper {
             while (resultset.next()) {
                 if (resultset.getString("nazov").equalsIgnoreCase(recordname)|| resultset.getString("nazov").equalsIgnoreCase(recordname + " ")){
 
-                    dieloId = resultset.getInt("zaznam_id");
-                    String query = "insert into dielo.klucove_slova values (?) where zaznam_id = " + dieloId;
-                    String sql = "UPDATE dielo " +
-                            "SET klucove_slova = " + "'" +"---" + "'" + " WHERE zaznam_id=" + dieloId;
+                    dieloId = resultset.getInt("dielo_id");
+                    String query = "insert into diela.klucove_slova values (?) where dielo_id = " + dieloId;
+                    String sql = "UPDATE diela " +
+                            "SET klucove_slova = " + "'" +"---" + "'" + " WHERE dielo_id=" + dieloId;
                     try {
                         try {
                             con = DriverManager.getConnection(url, user, pass);
@@ -215,7 +195,7 @@ public class CREPC2scraper {
             con = DriverManager.getConnection(host, uName, uPass);
 
             Statement stat = con.createStatement();
-            return stat.executeQuery("SELECT * FROM dielo");
+            return stat.executeQuery("SELECT * FROM diela");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {

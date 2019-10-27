@@ -7,39 +7,19 @@ import java.sql.*;
 
 public class Main {
     public static void main(String[] args) {
-       ResultSet resultSet = databaseConnection();
-      CREPC1scraper crepc1scraper = new CREPC1scraper(resultSet);
-     CREPC2scraper crepc2scraper = new CREPC2scraper();
-     int crepc1counter = 0;
-     int crepc2counter = 0;
-       // crepc1scraper.searchForRecordKeyword("Management Tool for Effective  Decision - Business Intelligence ", "ISSN 2048-4186 ");
-        //  crepc2scraper.searchForRecordKeyword("Open structured databases' use in destination management ", "ISBN 978-90-828093-5-0 ");
-       /* try{
-            while (resultSet.next()){
-                crepc2scraper.searchForRecordKeyword(resultSet.getString("nazov"), "");
-                break;
-            }
-        }
-        catch (SQLException e){
-            e.printStackTrace();
+        ResultSet resultSet = databaseConnection();
+        CREPC1scraper crepc1scraper = new CREPC1scraper(resultSet);
+        int crepc2counter = 0;
 
-        }*/
         try {
             assert resultSet != null;
             while (resultSet.next()) {
-                if(crepc2counter > 20){
 
-                    crepc2scraper = new CREPC2scraper();
-                    crepc2counter = 0;
-                }
                 if (resultSet.getString("klucove_slova") == null || resultSet.getString("klucove_slova").equalsIgnoreCase("") || resultSet.getString("klucove_slova").equalsIgnoreCase("---")) {
-                    System.out.println("Doing: " + resultSet.getRow());
+                    System.out.println("Doing 2017: " + resultSet.getRow());
 
 
                     if (Integer.valueOf(resultSet.getString("rok_vydania")) <= 2017) {
-                        crepc1counter++;
-
-
                         if (resultSet.getString("ISBN") != null) {
                             crepc1scraper.searchForRecordKeyword(resultSet.getString("nazov"), resultSet.getString("ISBN"));
                         } else if (resultSet.getString("ISSN") != null) {
@@ -49,7 +29,26 @@ public class Main {
                             crepc1scraper.searchForRecordKeyword(resultSet.getString("nazov"), "");
                         }
                         System.out.println();
-                    } else {
+                    }
+                } else {
+                    System.out.println("Doing 2017: " + resultSet.getRow() + " (Skipped)");
+
+                }
+            }
+            resultSet = databaseConnection();
+            CREPC2scraper crepc2scraper = new CREPC2scraper();
+
+            while (resultSet.next()) {
+                if (crepc2counter > 1) {
+                    crepc2scraper.close();
+                    crepc2scraper = new CREPC2scraper();
+                    crepc2counter = 0;
+                }
+                if (resultSet.getString("klucove_slova") == null || resultSet.getString("klucove_slova").equalsIgnoreCase("") || resultSet.getString("klucove_slova").equalsIgnoreCase("---")) {
+                    System.out.println("Doing 2018: " + resultSet.getRow());
+
+
+                    if (Integer.valueOf(resultSet.getString("rok_vydania")) > 2017) {
                         crepc2counter++;
                         if (resultSet.getString("ISBN") != null) {
                             crepc2scraper.searchForRecordKeyword(resultSet.getString("nazov"), resultSet.getString("ISBN"));
@@ -59,22 +58,15 @@ public class Main {
                         } else {
                             crepc2scraper.searchForRecordKeyword(resultSet.getString("nazov"), "");
                         }
-                        // crepc2scraper.searchForRecordKeyword(resultSet.getString("nazov"), (resultSet.getString("isbn")==null || resultSet.getString("isbn").equalsIgnoreCase(""))? "" : resultSet.getString("isbn"));
                     }
-                }
-                else{
-                    System.out.println("Doing: " + resultSet.getRow() + " (Skipped)");
+                } else {
+                    System.out.println("Doing 2018: " + resultSet.getRow() + " (Skipped)");
 
                 }
             }
-            } catch(SQLException e){
-                e.printStackTrace();
-            }
-
-
-
-        //  crepc1scraper.searchForRecordKeyword("Monitorovanie a oprava oceľového potrubia používaného na transport plynu a ropy");
-        //crepc1scraper.searchForRecordKeyword("Tools for organizational changes managing in companies with high qualified employees");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -91,7 +83,7 @@ public class Main {
             con = DriverManager.getConnection(host, uName, uPass);
 
             Statement stat = con.createStatement();
-            return stat.executeQuery("SELECT * FROM dielo");
+            return stat.executeQuery("SELECT * FROM diela");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
