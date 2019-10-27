@@ -4,7 +4,6 @@ public class Ohlas {
     private Integer ohlas_id = null;
     private Integer rok_vydania = null;
     private String nazov = null;
-    private String zbierka = null;
     private String strany = null;
     private String ISBN = null;
     private String ISSN = null;
@@ -42,14 +41,6 @@ public class Ohlas {
 
     public void setNazov(String nazov) {
         this.nazov = nazov;
-    }
-
-    public String getZbierka() {
-        return zbierka;
-    }
-
-    public void setZbierka(String zbierka) {
-        this.zbierka = zbierka;
     }
 
     public String getStrany() {
@@ -98,5 +89,20 @@ public class Ohlas {
 
     public void setKategoria_ohlasu_id(int kategoria_ohlasu_id) {
         this.kategoria_ohlasu_id = kategoria_ohlasu_id;
+    }
+
+    @Override
+    public String toString() {
+        return "Ohlas{" +
+                "ohlas_id=" + ohlas_id +
+                ", rok_vydania=" + rok_vydania +
+                ", nazov='" + nazov + '\'' +
+                ", strany='" + strany + '\'' +
+                ", ISBN='" + ISBN + '\'' +
+                ", ISSN='" + ISSN + '\'' +
+                ", miesto_vydania='" + miesto_vydania + '\'' +
+                ", dielo_id=" + dielo_id +
+                ", kategoria_ohlasu_id=" + kategoria_ohlasu_id +
+                '}';
     }
 }

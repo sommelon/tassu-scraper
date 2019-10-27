@@ -127,4 +127,24 @@ public class Dielo {
     public void setKategoria_id(Integer kategoria_id) {
         this.kategoria_id = kategoria_id;
     }
+
+    @Override
+    public String toString() {
+        return "Dielo{" +
+                "dielo_id=" + dielo_id +
+                ", archivacne_cislo='" + archivacne_cislo + '\'' +
+                ", rok_vydania=" + rok_vydania +
+                ", nazov='" + nazov + '\'' +
+                ", podnazov='" + podnazov + '\'' +
+                ", vydanie='" + vydanie + '\'' +
+                ", ISBN='" + ISBN + '\'' +
+                ", ISSN='" + ISSN + '\'' +
+                ", miesto_vydania='" + miesto_vydania + '\'' +
+                ", klucove_slova='" + klucove_slova + '\'' +
+                ", odkaz='" + odkaz + '\'' +
+                ", strany='" + strany + '\'' +
+                ", priloha='" + priloha + '\'' +
+                ", kategoria_id=" + kategoria_id +
+                '}';
+    }
 }

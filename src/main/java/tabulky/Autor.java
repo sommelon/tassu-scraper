@@ -28,4 +28,13 @@ public class Autor {
     public void setPriezvisko(String priezvisko) {
         this.priezvisko = priezvisko;
     }
+
+    @Override
+    public String toString() {
+        return "Autor{" +
+                "autor_id=" + autor_id +
+                ", meno='" + meno + '\'' +
+                ", priezvisko='" + priezvisko + '\'' +
+                '}';
+    }
 }
