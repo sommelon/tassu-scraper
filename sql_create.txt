@@ -65,6 +65,7 @@ CREATE TABLE Diela
 	klucove_slova VARCHAR(256),
 	odkaz VARCHAR(1000),
 	strany VARCHAR(20),
+	vydanie VARCHAR(20),
 	priloha VARCHAR(300),
 	kategoria_id INT NOT NULL,
 	PRIMARY KEY (dielo_id),
