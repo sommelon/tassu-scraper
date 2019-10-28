@@ -1,5 +1,7 @@
 package tabulky;
 
+import java.util.Objects;
+
 public class Autor {
     private Integer autor_id = null;
     private String meno = null;

@@ -60,23 +60,23 @@ public class Main {
 //        spustenie scrapera pre vsetky strediska
 
         //toto je len na to, aby som vedel zacat odkial chcem
-        {
-            strediskaFBERGNazov.subList(0, 3).clear();
-
-            ZaznamyScraper z = new ZaznamyScraper();
-            z.vybratPracovisko("01", strediskaFBERGNazov.get(0));
-            z.goToPage(9);
-            z.scrape();
-            z.getDriver().close();
-            strediskaFBERGNazov.remove(0);
-        }
-
-//        for (String stredisko : strediskaLFNazov) {
-//            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-//            zaznamyScraper.vybratPracovisko("09", stredisko);
-//            zaznamyScraper.scrape();
-//            zaznamyScraper.getDriver().close();
+//        {
+//            strediskaFBERGNazov.subList(0, 7).clear();
+//
+//            ZaznamyScraper z = new ZaznamyScraper();
+//            z.vybratPracovisko("01", strediskaFBERGNazov.get(0));
+//            z.goToPage(14);
+//            z.scrape();
+//            z.getDriver().close();
+//            strediskaFBERGNazov.remove(0);
 //        }
+
+        for (String stredisko : strediskaLFNazov) {
+            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+            zaznamyScraper.vybratPracovisko("09", stredisko);
+            zaznamyScraper.scrape();
+            zaznamyScraper.getDriver().close();
+        }
 
         for (String stredisko : strediskaFBERGNazov) {
             ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
@@ -84,15 +84,6 @@ public class Main {
             zaznamyScraper.scrape();
             zaznamyScraper.getDriver().close();
         }
-
-//        ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-////        zaznamyScraper.vybratPracovisko("01", "101001");
-//        zaznamyScraper.vybratPracovisko("09", "Dekanát LF");
-//        zaznamyScraper.goToPage(3);
-//        zaznamyScraper.scrape();
-
-
-
 
         db.closeConnection();
     }

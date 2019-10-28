@@ -198,7 +198,12 @@ public class ZaznamyScraper {
             ostatne = medzeryP.matcher(ostatne).replaceAll("");
             int i1 = ostatne.indexOf("ZPokrBezUZ") + 12;
             int i2 = ostatne.indexOf("<a");
-            ostatne = ostatne.substring(i1, i2);
+            try {
+                ostatne = ostatne.substring(i1, i2);
+            }catch (StringIndexOutOfBoundsException e){
+                System.err.println(riadokTabulky.findElement(By.xpath("td[5]/p")).getAttribute("innerHTML"));
+                return;
+            }
             ostatne = sposobPristupuP.matcher(ostatne).replaceAll("");
 
             m = optickyDiskP.matcher(ostatne);
@@ -283,12 +288,6 @@ public class ZaznamyScraper {
             ArrayList<Autor> autori = new ArrayList<Autor>();
             ArrayList<Integer> podiely = new ArrayList<Integer>();
             for (String autorAPodiel : autoriRozdelene) {
-                m = podielP.matcher(autorAPodiel);
-                if (m.find())
-                    podiely.add(Integer.parseInt(m.group(0)));
-                else
-                    podiely.add(null);
-
                 m = autorP.matcher(autorAPodiel);
                 //odstrani podiel a rozdeli meno a priezvisko podla ciarky
                 String[] priezviskoAMeno = m.replaceFirst("").split(", ");
@@ -305,14 +304,28 @@ public class ZaznamyScraper {
                     }
                     autor.setPriezvisko(priezvisko);
                 }
+
+                //ak je uz tento autor v liste, neprida ho
+                boolean duplicate = false;
+                for (Autor a : autori) {
+                    if (a.getMeno() == autor.getMeno() && a.getPriezvisko() == autor.getPriezvisko()) {
+                        duplicate = true;
+                        break;
+                    }
+                }
+                if (duplicate)
+                    continue;
+
                 autori.add(autor);
+
+                m = podielP.matcher(autorAPodiel);
+                if (m.find())
+                    podiely.add(Integer.parseInt(m.group(0)));
+                else
+                    podiely.add(null);
             }
 
-            try {
-                nahratDoDB(dielo, autori, ohlasy, podiely);
-            }catch (SQLException e){
-                e.printStackTrace();
-            }
+            nahratDoDB(dielo, autori, ohlasy, podiely);
 
         } else { //ak dielo uz je v databaze, urobi sa zaznam s novym pracoviskom v tabulke autor_dielo_pracovisko
             int dieloID = rs.getInt(1);
@@ -430,6 +443,19 @@ public class ZaznamyScraper {
                     }
                     autor.setPriezvisko(priezvisko);
                 }
+                //ak je uz tento autor v liste, neprida ho
+                boolean duplicate = false;
+                if (ohlas.getAutori().size() != 0) {
+                    for (Autor a : ohlas.getAutori()) {
+                        if (a.getMeno() == autor.getMeno() && a.getPriezvisko() == autor.getPriezvisko()) {
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                }
+                if (duplicate)
+                    continue;
+
                 ohlas.getAutori().add(autor);
             }
 
