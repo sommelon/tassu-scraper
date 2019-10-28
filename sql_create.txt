@@ -56,7 +56,7 @@ CREATE TABLE Diela
 (
 	dielo_id INT NOT NULL AUTO_INCREMENT,
 	archivacne_cislo VARCHAR(20) NOT NULL,
-	rok_vydania INT NOT NULL,
+	rok_vydania VARCHAR(10) NOT NULL,
 	nazov VARCHAR(500) NOT NULL,
 	podnazov VARCHAR(500),
 	ISBN VARCHAR(40),

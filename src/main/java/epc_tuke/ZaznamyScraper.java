@@ -335,6 +335,16 @@ public class ZaznamyScraper {
             while (rs.next()){
                 if (rs.getInt(3) == pracoviskoID) //ak uz je dielo v tomto pracovisku
                     return;
+
+                //ak uz je autorID z DB v liste autorIDs, tak sa neprida
+                boolean duplicate = false;
+                for (Integer autorID : autorIDs) {
+                    if (autorID == rs.getInt(1))
+                        duplicate = true;
+                }
+                if (duplicate)
+                    continue;
+
                 autorIDs.add(rs.getInt(1));
                 podiely.add(rs.getInt(2));
             }
