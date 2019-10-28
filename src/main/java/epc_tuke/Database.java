@@ -14,8 +14,8 @@ public class Database {
 
     private String sDielo = "select dielo_id from diela where archivacne_cislo = ?";
     private String iDielo = "insert into diela " +
-            "(archivacne_cislo, rok_vydania, nazov, podnazov,ISBN, ISSN, miesto_vydania, klucove_slova, odkaz, strany, priloha, kategoria_id) " +
-            "values (?,?,?,?,?,?,?,?,?,?,?,?)";
+            "(archivacne_cislo, rok_vydania, nazov, podnazov,ISBN, ISSN, miesto_vydania, klucove_slova, odkaz, strany, vydanie, priloha, kategoria_id) " +
+            "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private String iDieloOhlas = "insert into dielo_ohlas (dielo_id, ohlas_id) values (?,?)";
     private String iAutor = "insert into autori (meno, priezvisko) values (?,?)";
     private String sAutor = "select autor_id from autori where meno = ? and priezvisko = ?";
@@ -127,7 +127,7 @@ public class Database {
         ResultSet rs = null;
         try {
             psDielo.setString(1, dielo.getArchivacne_cislo());
-            psDielo.setInt(2, dielo.getRok_vydania());
+            psDielo.setString(2, dielo.getRok_vydania());
             psDielo.setString(3, dielo.getNazov());
             psDielo.setString(4, dielo.getPodnazov());
             psDielo.setString(5, dielo.getISBN());
@@ -136,8 +136,9 @@ public class Database {
             psDielo.setString(8, dielo.getKlucove_slova());
             psDielo.setString(9, dielo.getOdkaz());
             psDielo.setString(10, dielo.getStrany());
-            psDielo.setString(11, dielo.getPriloha());
-            psDielo.setInt(12, dielo.getKategoria_id());
+            psDielo.setString(11, dielo.getVydanie());
+            psDielo.setString(12, dielo.getPriloha());
+            psDielo.setInt(13, dielo.getKategoria_id());
 
             psDielo.executeUpdate();
             rs = psDielo.getGeneratedKeys();

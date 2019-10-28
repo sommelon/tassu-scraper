@@ -3,7 +3,7 @@ package tabulky;
 public class Dielo {
     private Integer dielo_id = null;
     private String archivacne_cislo = null;
-    private Integer rok_vydania = null;
+    private String rok_vydania = null;
     private String nazov = null;
     private String podnazov = null;
     private String vydanie = null;
@@ -32,11 +32,11 @@ public class Dielo {
         this.archivacne_cislo = archivacne_cislo;
     }
 
-    public Integer getRok_vydania() {
+    public String getRok_vydania() {
         return rok_vydania;
     }
 
-    public void setRok_vydania(Integer rok_vydania) {
+    public void setRok_vydania(String rok_vydania) {
         this.rok_vydania = rok_vydania;
     }
 

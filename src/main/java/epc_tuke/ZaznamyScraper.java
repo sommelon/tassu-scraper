@@ -47,7 +47,7 @@ public class ZaznamyScraper {
     private Pattern strany1P = Pattern.compile(" [PSps]\\.?\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])"); //strany aj s poznamkou v hranatych zatvorkach
     private Pattern strany2P = Pattern.compile(" ([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?\\.?");// 86 p, [86] p
     private Pattern prilohaP = Pattern.compile("( \\[[\\p{L} :\\-]+\\])+"); //[CD-ROM] [USB kluc]
-    private Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? ?[^-]*)-");
+    private Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? ?[^-]*)- ");
     private Pattern podielP = Pattern.compile("[0-9]{1,3}");
     private Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
     private Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
@@ -185,7 +185,7 @@ public class ZaznamyScraper {
             if (kategoria_id == null)
                 System.err.println("Kategoria sa nenasla.");
             dielo.setKategoria_id(kategoria_id);
-            dielo.setRok_vydania(Integer.parseInt(riadokTabulky.findElement(By.xpath("td[4]/span")).getText()));
+            dielo.setRok_vydania(riadokTabulky.findElement(By.xpath("td[4]/span")).getText());
             dielo.setNazov(riadokTabulky.findElement(By.xpath("td[5]/p/b/span")).getText());
             String podnazov = riadokTabulky.findElement(By.xpath("td[5]/p/span[1]")).getText();
             dielo.setPodnazov(podnazov.substring(0, podnazov.length()-1)); //substring kvoli vymazaniu lomitka na konci
