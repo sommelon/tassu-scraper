@@ -62,11 +62,9 @@ CREATE TABLE Diela
 	ISBN VARCHAR(40),
 	ISSN VARCHAR(40),
 	miesto_vydania VARCHAR(500),
-	klucove_slova VARCHAR(256),
 	odkaz VARCHAR(1000),
 	strany VARCHAR(20),
 	vydanie VARCHAR(20),
-	priloha VARCHAR(300),
 	kategoria_id INT NOT NULL,
 	PRIMARY KEY (dielo_id),
 	FOREIGN KEY (kategoria_id) REFERENCES Kategorie(kategoria_id),
@@ -115,4 +113,20 @@ CREATE TABLE autor_ohlas
 	PRIMARY KEY (ohlas_id, autor_id),
 	FOREIGN KEY (ohlas_id) REFERENCES Ohlasy(ohlas_id),
 	FOREIGN KEY (autor_id) REFERENCES Autori(autor_id)
+);
+
+CREATE TABLE klucove_slova
+(
+  klucove_slovo_id INT NOT NULL,
+  klucove_slovo VARCHAR(200) NOT NULL,
+  PRIMARY KEY (klucove_slovo_id)
+);
+
+CREATE TABLE dielo_klucove_slovo
+(
+  klucove_slovo_id INT NOT NULL,
+  dielo_id INT NOT NULL,
+  PRIMARY KEY (klucove_slovo_id, dielo_id),
+  FOREIGN KEY (klucove_slovo_id) REFERENCES klucove_slova(klucove_slovo_id),
+  FOREIGN KEY (dielo_id) REFERENCES Diela(dielo_id)
 );
