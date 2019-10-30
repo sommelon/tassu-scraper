@@ -47,7 +47,7 @@ public class ZaznamyScraper {
     private Pattern strany1P = Pattern.compile(" [PSps]\\.?\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])"); //strany aj s poznamkou v hranatych zatvorkach
     private Pattern strany2P = Pattern.compile(" ([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\]) [PSps]\\.?\\.?");// 86 p, [86] p
     private Pattern prilohaP = Pattern.compile("( \\[[\\p{L} :\\-]+\\])+"); //[CD-ROM] [USB kluc]
-    private Pattern vydanieP = Pattern.compile("(- | )?(\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? ?[^-]*)- ");
+    private Pattern vydanieP = Pattern.compile("-? (\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? [^-]*)- ");
     private Pattern podielP = Pattern.compile("[0-9]{1,3}");
     private Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
     private Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
@@ -93,7 +93,7 @@ public class ZaznamyScraper {
 
             //najde a klikne na stredisko
             wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
-//            wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")));
             driver.findElement(By.id("ctl00_ContentPlaceHolderMain_ddlStredisko")).click();
             if (fakultaValue.equals("09")) {
                 wait.until(ExpectedConditions.presenceOfElementLocated(
@@ -178,6 +178,7 @@ public class ZaznamyScraper {
         ResultSet rs;
         Dielo dielo = new Dielo();
         dielo.setArchivacne_cislo(riadokTabulky.findElement(By.xpath("td[2]/span")).getText());
+
         rs = db.selectDielo(dielo.getArchivacne_cislo());
         if (!rs.next()) { //ak dielo este nie je v tabulke, vytiahnu sa ostatne data
             String kategoria = riadokTabulky.findElement(By.xpath("td[3]/span")).getText();
@@ -251,7 +252,7 @@ public class ZaznamyScraper {
 
             m = vydanieP.matcher(ostatne);
             if (m.find()) {
-                dielo.setVydanie(hranateZatvorkyP.matcher(m.group(2)).replaceAll(""));
+                dielo.setVydanie(hranateZatvorkyP.matcher(m.group(1)).replaceAll(""));
                 ostatne = m.replaceAll("");
             }
 
@@ -329,6 +330,7 @@ public class ZaznamyScraper {
 
         } else { //ak dielo uz je v databaze, urobi sa zaznam s novym pracoviskom v tabulke autor_dielo_pracovisko
             int dieloID = rs.getInt(1);
+
             rs = db.selectAutorIdAPodielAPracoviskoByDielo(dieloID);
             ArrayList<Integer> autorIDs = new ArrayList<Integer>();
             ArrayList<Integer> podiely = new ArrayList<Integer>();

@@ -61,22 +61,22 @@ public class Main {
 
         //toto je len na to, aby som vedel zacat odkial chcem
         {
-            strediskaFBERGNazov.subList(0, 13).clear();
+            strediskaLFNazov.subList(0, 6).clear();
 
             ZaznamyScraper z = new ZaznamyScraper();
-            z.vybratPracovisko("01", strediskaFBERGNazov.get(0));
-            z.goToPage(84);
+            z.vybratPracovisko("09", strediskaLFNazov.get(0));
+//            z.goToPage(54);
             z.scrape();
             z.getDriver().close();
-            strediskaFBERGNazov.remove(0);
+            strediskaLFNazov.remove(0);
         }
 
-//        for (String stredisko : strediskaLFNazov) {
-//            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
-//            zaznamyScraper.vybratPracovisko("09", stredisko);
-//            zaznamyScraper.scrape();
-//            zaznamyScraper.getDriver().close();
-//        }
+        for (String stredisko : strediskaLFNazov) {
+            ZaznamyScraper zaznamyScraper = new ZaznamyScraper();
+            zaznamyScraper.vybratPracovisko("09", stredisko);
+            zaznamyScraper.scrape();
+            zaznamyScraper.getDriver().close();
+        }
 
         for (String stredisko : strediskaFBERGNazov) {
             ZaznamyScraper zaznamyScraper = new ZaznamyScraper();

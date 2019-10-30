@@ -25,8 +25,11 @@ public class Database {
     private String sAutorIdAPodielAPracovisko = "select autor_id, percentualny_podiel, pracovisko_id from autor_dielo_pracovisko where dielo_id = ?";
     private String iAutorDieloPracovisko = "insert into autor_dielo_pracovisko (autor_id, dielo_id, pracovisko_id, percentualny_podiel) values (?,?,?,?)";
 
-    private Statement stKategorie;
-    private Statement stPracoviska;
+    private String iKlucoveSlova = "insert into klucove_slova (klucove_slovo) values (?)";
+    private String klucoveSlovoId = "select klucove_slovo_id from klucove_slova where klucove_slovo = ?";
+    private String iDieloKlucoveSlovo = "insert into dielo_klucove_slovo (dielo_id, klucove_slovo_id) values (?,?)";
+
+    private Statement statement;
     private PreparedStatement psDielo;
     private PreparedStatement psDieloOhlas;
     private PreparedStatement psDieloSelect;
@@ -37,6 +40,10 @@ public class Database {
     private PreparedStatement psAutorOhlas;
     private PreparedStatement psAutorIdAPodielAPracoviskoByDielo;
     private PreparedStatement psAutorDieloPracovisko;
+
+    private PreparedStatement psKlucoveSlova;
+    private PreparedStatement psKlucoveSlovoId;
+    private PreparedStatement psDieloKlucoveSlovo;
 
     private Hashtable<String, Integer> kategorie = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> pracoviska = new Hashtable<String, Integer>();
@@ -69,8 +76,7 @@ public class Database {
 
             try {
                 con = DriverManager.getConnection(url, user, pass);
-                stKategorie = con.createStatement();
-                stPracoviska = con.createStatement();
+                statement = con.createStatement();
                 psDielo = con.prepareStatement(iDielo, Statement.RETURN_GENERATED_KEYS);
                 psDieloOhlas = con.prepareStatement(iDieloOhlas, Statement.RETURN_GENERATED_KEYS);
                 psDieloSelect = con.prepareStatement(sDielo);
@@ -81,6 +87,10 @@ public class Database {
                 psOhlasSelect = con.prepareStatement(sOhlas);
                 psAutorIdAPodielAPracoviskoByDielo = con.prepareStatement(sAutorIdAPodielAPracovisko);
                 psAutorDieloPracovisko = con.prepareStatement(iAutorDieloPracovisko);
+
+                psKlucoveSlova = con.prepareStatement(iKlucoveSlova, Statement.RETURN_GENERATED_KEYS);
+                psKlucoveSlovoId = con.prepareStatement(klucoveSlovoId);
+                psDieloKlucoveSlovo = con.prepareStatement(iDieloKlucoveSlovo);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -93,8 +103,7 @@ public class Database {
 
     public void closeConnection(){
         try {
-            stKategorie.close();
-            stPracoviska.close();
+            statement.close();
             psDielo.close();
             psDieloOhlas.close();
             psDieloSelect.close();
@@ -105,6 +114,10 @@ public class Database {
             psOhlasSelect.close();
             psAutorIdAPodielAPracoviskoByDielo.close();
             psAutorDieloPracovisko.close();
+
+            psKlucoveSlova.close();
+            psKlucoveSlovoId.close();
+            psDieloKlucoveSlovo.close();
             if (con != null)
                 con.close();
         } catch (SQLException e) {
@@ -265,7 +278,7 @@ public class Database {
         ResultSet rs;
 
         try {
-            rs = stKategorie.executeQuery(query);
+            rs = statement.executeQuery(query);
             while(rs.next()){
                 kategorie.put(rs.getString(1), rs.getInt(2));
             }
@@ -279,13 +292,59 @@ public class Database {
         ResultSet rs;
 
         try {
-            rs = stPracoviska.executeQuery(query);
+            rs = statement.executeQuery(query);
             while(rs.next()){
                 pracoviska.put(rs.getString(1), rs.getInt(2));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public ResultSet insertIntoKlucove_slova(String klucove_slovo){
+        ResultSet rs = null;
+
+        try {
+            psKlucoveSlovoId.setString(1, klucove_slovo);
+            rs = psKlucoveSlovoId.executeQuery();
+            if (rs.next()) { //ak existuje take klucove slovo, vrati ID toho klucoveho slova
+                rs.beforeFirst();
+                return rs;
+            }
+
+            psKlucoveSlova.setString(1, klucove_slovo);
+            psKlucoveSlova.executeUpdate();
+            rs = psKlucoveSlova.getGeneratedKeys();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return rs;
+    }
+
+    public void insertIntoDieloKlucoveSlova(Integer dielo_id, Integer klucove_slovo_id){
+        try {
+            psDieloKlucoveSlovo.setInt(1, dielo_id);
+            psDieloKlucoveSlovo.setInt(2, klucove_slovo_id);
+
+            psDieloKlucoveSlovo.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ResultSet selectKlucove_slova(){
+        String query = "select dielo_id, klucove_slova from diela where klucove_slova is not null";
+        ResultSet rs = null;
+
+        try {
+            rs = statement.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rs;
     }
 
     public Hashtable<String, Integer> getKategorie() {
