@@ -88,6 +88,8 @@ public class Database {
                 psAutorIdAPodielAPracoviskoByDielo = con.prepareStatement(sAutorIdAPodielAPracovisko);
                 psAutorDieloPracovisko = con.prepareStatement(iAutorDieloPracovisko);
 
+                psPodiel = con.prepareStatement(uPodiel);
+                psDieloPracovisko = con.prepareStatement(sDieloPracovisko);
                 psKlucoveSlova = con.prepareStatement(iKlucoveSlova, Statement.RETURN_GENERATED_KEYS);
                 psKlucoveSlovoId = con.prepareStatement(klucoveSlovoId);
                 psDieloKlucoveSlovo = con.prepareStatement(iDieloKlucoveSlovo);
@@ -115,6 +117,8 @@ public class Database {
             psAutorIdAPodielAPracoviskoByDielo.close();
             psAutorDieloPracovisko.close();
 
+            psPodiel.close();
+            psDieloPracovisko.close();
             psKlucoveSlova.close();
             psKlucoveSlovoId.close();
             psDieloKlucoveSlovo.close();
@@ -346,6 +350,55 @@ public class Database {
 
         return rs;
     }
+
+    public ResultSet selectAutorDieloPracovisko(){
+        String query = "select autor_id, dielo_id, pracovisko_id from autor_dielo_pracovisko where percentualny_podiel is null";
+        ResultSet rs = null;
+
+        try {
+            rs = statement.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rs;
+    }
+
+    private String sDieloPracovisko = "select percentualny_podiel from autor_dielo_pracovisko where dielo_id = ? and pracovisko_id = ?";
+    private PreparedStatement psDieloPracovisko;
+
+    public ResultSet selectPodiel(int dieloId, int pracoviskoId){
+        ResultSet rs = null;
+
+        try {
+            psDieloPracovisko.setInt(1, dieloId);
+            psDieloPracovisko.setInt(2, pracoviskoId);
+            rs = psDieloPracovisko.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rs;
+    }
+
+    private String uPodiel = "update autor_dielo_pracovisko set percentualny_podiel = ? where autor_id = ? and dielo_id = ? and pracovisko_id = ?";
+    private PreparedStatement psPodiel;
+
+    public int updatePodiel(int podiel, int autorId, int dieloId, int pracoviskoId){
+        int rows = -1;
+        try {
+            psPodiel.setInt(1, podiel);
+            psPodiel.setInt(2, autorId);
+            psPodiel.setInt(3, dieloId);
+            psPodiel.setInt(4, pracoviskoId);
+            rows = psPodiel.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+
 
     public Hashtable<String, Integer> getKategorie() {
         return kategorie;

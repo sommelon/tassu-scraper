@@ -49,7 +49,7 @@ public class ZaznamyScraper {
     private Pattern prilohaP = Pattern.compile("( \\[[\\p{L} :\\-]+\\])+"); //[CD-ROM] [USB kluc]
     private Pattern vydanieP = Pattern.compile("-? (\\[?[0-9]+\\.?[^-,]+vyd\\.?\\]? [^-]*)- ");
     private Pattern podielP = Pattern.compile("[0-9]{1,3}");
-    private Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)");
+    private Pattern autorP = Pattern.compile(" +\\([0-9]{1,3}%?\\)"); //" +\([^\)]\)" asi tak by to malo byt lebo v zatvorkach su niekedy aj znaky, ktore by tam nemali byt a tym padom sa podiel nevymaze a ostane v autorovom mene
     private Pattern ohlasP = Pattern.compile("([0-9]{4})  ?\\[([0-9]{1,2})\\] ([^<]+)");
     private Pattern znakyNaStranachP = Pattern.compile("^[:.\\-, ]+|[:.\\-, ]+$|\\[\\]");
     private Pattern autorOhlasuP = Pattern.compile("\\p{Lu}+ ?, ?\\p{Lu}[^, :]+");
