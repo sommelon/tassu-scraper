@@ -41,7 +41,7 @@ public class ZaznamyScraper {
     private Pattern ISSNP = Pattern.compile("ISSN:? ?([\\- 0-9]+[xX]?)"); //ZLY FORMAT, ale neviem co robit s takymi udajmi, tak ich proste dam do DB tak jak su tam
     //    private Pattern rokP = Pattern.compile("(- |\\(| )(19[6-9][0-9]|20[01][0-9])(\\.|\\)),?( -| |\n)");
 //    private Pattern rok1P = Pattern.compile("(- |\\(| )?(19[6-9][0-9]|20[01][0-9])(\\.|\\))?( -| )?"); //rok vo vseobecnosti na roznych miestach
-    private Pattern rokNaKonciP = Pattern.compile("[,\\- ]?\\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania
+    private Pattern rokNaKonciP = Pattern.compile("[,\\- ]?\\(?(19[6-9][0-9]|20[01][0-9])\\)? ?$"); //rok na konci riadku - mal by byt na konci miesta vydania. Najde iba roky v rozsahu 1960-2019.
     private Pattern cisloNaKonciP = Pattern.compile("- [\\(\\[]?[0-9][\\)\\]]? *$"); //cislo na konci riadku po pomlcke nema vyznam '- 78'
     private Pattern stranyNeuvedeneP = Pattern.compile("([SPsp]\\.? neuved[^ \\-\n]?)|(neuved[^ \\-\n]? [SPsp]\\.?)");
     private Pattern strany1P = Pattern.compile(" [PSps]\\.?\\.? ?([0-9]+(-[0-9]+)?|\\[[0-9]+(-[0-9]+)?\\])"); //strany aj s poznamkou v hranatych zatvorkach

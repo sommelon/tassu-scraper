@@ -398,7 +398,23 @@ public class Database {
         return rows;
     }
 
+    public ResultSet selectStrany(){
+        //query treba menit pre kazdu DB podla potreby!
+        String query = "select dielo_id, strany from diela where strany is not null";
+        ResultSet rs = null;
 
+        try {
+            rs = statement.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rs;
+    }
+
+    public void updatePocetStran(){
+
+    }
 
     public Hashtable<String, Integer> getKategorie() {
         return kategorie;
