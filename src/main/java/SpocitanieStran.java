@@ -1,4 +1,4 @@
-import epc_tuke.Database;
+import databases.FBERG_LF_DB;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class SpocitanieStran {
     public static void main(String[] args) throws SQLException {
-        Database db = Database.getInstance();
+        FBERG_LF_DB db = FBERG_LF_DB.getInstance();
         ResultSet rs = db.selectStrany();
         Pattern rozsahStranP = Pattern.compile("([0-9]+) ?- ?([0-9]+)?");
         Matcher m;

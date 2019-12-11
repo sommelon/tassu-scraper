@@ -1,13 +1,13 @@
 package priradenie_podielov;
 
-import epc_tuke.Database;
+import databases.FBERG_LF_DB;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class FEI_FU {
     public static void main(String[] args) throws SQLException {
-        Database db = Database.getInstance();
+        FBERG_LF_DB db = FBERG_LF_DB.getInstance();
         ResultSet rs = db.selectAutorDieloPracovisko();
 
         while (rs.next()){

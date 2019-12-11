@@ -1,26 +1,21 @@
-package epc_tuke;
+package databases;
 
 import tabulky.*;
 
 import java.sql.*;
 import java.util.Hashtable;
 
-public class Database {
-    private static Database singleInstance = null;
-//    private final String url = "jdbc:mysql://localhost:3306/tassu?useLegacyDatetimeCode=false&serverTimezone=UTC";
-//    private final String url = "jdbc:mysql://localhost:3306/fberg_lf?useLegacyDatetimeCode=false&serverTimezone=UTC";
-    private final String url = "jdbc:mysql://localhost:3306/fei_fu?useLegacyDatetimeCode=false&serverTimezone=UTC";
-//    private final String url = "jdbc:mysql://localhost:3306/fvt_fmmr?useLegacyDatetimeCode=false&serverTimezone=UTC";
-//    private final String url = "jdbc:mysql://localhost:3306/rekt_sjf?useLegacyDatetimeCode=false&serverTimezone=UTC";
-//    private final String url = "jdbc:mysql://localhost:3306/sf_ef?useLegacyDatetimeCode=false&serverTimezone=UTC";
+public class FBERG_LF_DB {
+    private static FBERG_LF_DB singleInstance = null;
+    private final String url = "jdbc:mysql://localhost:3306/fberg_lf?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "root";
     private Connection con = null;
 
     private String sDielo = "select dielo_id from diela where archivacne_cislo = ?";
     private String iDielo = "insert into diela " +
-            "(archivacne_cislo, rok_vydania, nazov, podnazov,ISBN, ISSN, miesto_vydania, klucove_slova, odkaz, strany, vydanie, priloha, kategoria_id) " +
-            "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            "(archivacne_cislo, rok_vydania, nazov, podnazov,ISBN, ISSN, miesto_vydania, odkaz, strany, vydanie, kategoria_id) " +
+            "values (?,?,?,?,?,?,?,?,?,?,?)";
     private String iDieloOhlas = "insert into dielo_ohlas (dielo_id, ohlas_id) values (?,?)";
     private String iAutor = "insert into autori (meno, priezvisko) values (?,?)";
     private String sAutor = "select autor_id from autori where meno = ? and priezvisko = ?";
@@ -33,7 +28,6 @@ public class Database {
     private String iKlucoveSlova = "insert into klucove_slova (klucove_slovo) values (?)";
     private String klucoveSlovoId = "select klucove_slovo_id from klucove_slova where klucove_slovo = ?";
     private String iDieloKlucoveSlovo = "insert into dielo_klucove_slovo (dielo_id, klucove_slovo_id) values (?,?)";
-    private String updatePocetStran = "UPDATE diela set strany = ? where dielo_id = ?";
 
     private Statement statement;
     private PreparedStatement psDielo;
@@ -54,7 +48,7 @@ public class Database {
     private Hashtable<String, Integer> kategorie = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> pracoviska = new Hashtable<String, Integer>();
 
-    private Database(){
+    private FBERG_LF_DB(){
         openConnection();
         selectKategorie();
         selectPracoviska();
@@ -65,14 +59,14 @@ public class Database {
         }
     }
 
-    public static Database getInstance(){
+    public static FBERG_LF_DB getInstance(){
         if(singleInstance == null)
-            singleInstance = new Database();
+            singleInstance = new FBERG_LF_DB();
 
         return singleInstance;
     }
 
-    public void openConnection() {
+    private void openConnection() {
         if (con == null) {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
@@ -158,12 +152,10 @@ public class Database {
             psDielo.setString(5, dielo.getISBN());
             psDielo.setString(6, dielo.getISSN());
             psDielo.setString(7, dielo.getMiesto_vydania());
-            psDielo.setString(8, dielo.getKlucove_slova());
-            psDielo.setString(9, dielo.getOdkaz());
-            psDielo.setString(10, dielo.getStrany());
-            psDielo.setString(11, dielo.getVydanie());
-            psDielo.setString(12, dielo.getPriloha());
-            psDielo.setInt(13, dielo.getKategoria_id());
+            psDielo.setString(8, dielo.getOdkaz());
+            psDielo.setString(9, dielo.getStrany());
+            psDielo.setString(10, dielo.getVydanie());
+            psDielo.setInt(11, dielo.getKategoria_id());
 
             psDielo.executeUpdate();
             rs = psDielo.getGeneratedKeys();
@@ -272,6 +264,8 @@ public class Database {
             e.printStackTrace();
         }
     }
+
+    private String updatePocetStran = "UPDATE diela set strany = ? where dielo_id = ?";
     public void updatePocetStran(int dielo_id, int pocetStran){
         try {
             if(pocetStran <= 0 || pocetStran > 1000){
@@ -448,10 +442,6 @@ public class Database {
         }
 
         return rs;
-    }
-
-    public void updatePocetStran(){
-
     }
 
     public Hashtable<String, Integer> getKategorie() {

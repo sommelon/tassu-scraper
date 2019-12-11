@@ -1,4 +1,5 @@
 package epc_tuke;
+import databases.FBERG_LF_DB;
 import tabulky.Autor;
 import tabulky.Dielo;
 import tabulky.Ohlas;
@@ -22,7 +23,7 @@ public class ZaznamyScraper {
     private int currentPage = 1;
     private int maxPages = 0;
     private Integer pracoviskoID;
-    private Database db = Database.getInstance();
+    private FBERG_LF_DB db = FBERG_LF_DB.getInstance();
 
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";

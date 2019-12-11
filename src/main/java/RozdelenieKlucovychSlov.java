@@ -1,19 +1,13 @@
-import epc_tuke.Database;
-import org.openqa.selenium.By;
-import tabulky.Autor;
-import tabulky.Ohlas;
+import databases.FBERG_LF_DB;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RozdelenieKlucovychSlov {
     public static void main(String[] args) throws SQLException {
-        Database db = Database.getInstance();
+        FBERG_LF_DB db = FBERG_LF_DB.getInstance();
         ResultSet rs = db.selectKlucove_slova();
         Pattern znakyNaStranachP = Pattern.compile("^ +| $");
 
