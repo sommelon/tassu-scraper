@@ -32,6 +32,7 @@ public class SpocitanieStran {
             if (pocetStran > 0 && pocetStran < 1000) {
                 //TODO zapisat do nejakej tabulky alebo rovno do star schemy
                 System.out.println("Dielo " + dieloId + " ma " + pocetStran + " stran.");
+
             }
         }
     }

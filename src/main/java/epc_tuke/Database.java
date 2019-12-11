@@ -7,7 +7,12 @@ import java.util.Hashtable;
 
 public class Database {
     private static Database singleInstance = null;
-    private final String url = "jdbc:mysql://localhost:3306/tassu?useLegacyDatetimeCode=false&serverTimezone=UTC";
+//    private final String url = "jdbc:mysql://localhost:3306/tassu?useLegacyDatetimeCode=false&serverTimezone=UTC";
+//    private final String url = "jdbc:mysql://localhost:3306/fberg_lf?useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private final String url = "jdbc:mysql://localhost:3306/fei_fu?useLegacyDatetimeCode=false&serverTimezone=UTC";
+//    private final String url = "jdbc:mysql://localhost:3306/fvt_fmmr?useLegacyDatetimeCode=false&serverTimezone=UTC";
+//    private final String url = "jdbc:mysql://localhost:3306/rekt_sjf?useLegacyDatetimeCode=false&serverTimezone=UTC";
+//    private final String url = "jdbc:mysql://localhost:3306/sf_ef?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "qwer";
     private Connection con = null;
@@ -321,7 +326,6 @@ public class Database {
             rs = psKlucoveSlova.getGeneratedKeys();
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
 
         return rs;
@@ -364,7 +368,26 @@ public class Database {
         return rs;
     }
 
-    private String sDieloPracovisko = "select percentualny_podiel from autor_dielo_pracovisko where dielo_id = ? and pracovisko_id = ?";
+    // FBERG_LF
+//    private String sDieloPracovisko = "select percentualny_podiel from autor_dielo_pracovisko where dielo_id = ? and pracovisko_id = ?";
+//    private PreparedStatement psDieloPracovisko;
+//
+//    public ResultSet selectPodiel(int dieloId, int pracoviskoId){
+//        ResultSet rs = null;
+//
+//        try {
+//            psDieloPracovisko.setInt(1, dieloId);
+//            psDieloPracovisko.setInt(2, pracoviskoId);
+//            rs = psDieloPracovisko.executeQuery();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return rs;
+//    }
+
+    //
+    private String sDieloPracovisko = "select contribution from author_publication where id_publication = ?";
     private PreparedStatement psDieloPracovisko;
 
     public ResultSet selectPodiel(int dieloId, int pracoviskoId){
@@ -372,7 +395,6 @@ public class Database {
 
         try {
             psDieloPracovisko.setInt(1, dieloId);
-            psDieloPracovisko.setInt(2, pracoviskoId);
             rs = psDieloPracovisko.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
