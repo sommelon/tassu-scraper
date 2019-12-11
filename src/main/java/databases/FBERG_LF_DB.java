@@ -12,23 +12,6 @@ public class FBERG_LF_DB {
     private final String pass  = "root";
     private Connection con = null;
 
-    private String sDielo = "select dielo_id from diela where archivacne_cislo = ?";
-    private String iDielo = "insert into diela " +
-            "(archivacne_cislo, rok_vydania, nazov, podnazov,ISBN, ISSN, miesto_vydania, odkaz, strany, vydanie, kategoria_id) " +
-            "values (?,?,?,?,?,?,?,?,?,?,?)";
-    private String iDieloOhlas = "insert into dielo_ohlas (dielo_id, ohlas_id) values (?,?)";
-    private String iAutor = "insert into autori (meno, priezvisko) values (?,?)";
-    private String sAutor = "select autor_id from autori where meno = ? and priezvisko = ?";
-    private String iOhlas = "insert into ohlasy (rok_vydania, nazov, ISBN, ISSN, miesto_vydania, strany, kategorie_ohlasov_id) values (?,?,?,?,?,?,?)";
-    private String iAutorOhlas = "insert into autor_ohlas (autor_id, ohlas_id) values (?,?)";
-    private String sOhlas = "select ohlas_id from ohlasy where nazov = ? and rok_vydania = ?";
-    private String sAutorIdAPodielAPracovisko = "select autor_id, percentualny_podiel, pracovisko_id from autor_dielo_pracovisko where dielo_id = ?";
-    private String iAutorDieloPracovisko = "insert into autor_dielo_pracovisko (autor_id, dielo_id, pracovisko_id, percentualny_podiel) values (?,?,?,?)";
-
-    private String iKlucoveSlova = "insert into klucove_slova (klucove_slovo) values (?)";
-    private String klucoveSlovoId = "select klucove_slovo_id from klucove_slova where klucove_slovo = ?";
-    private String iDieloKlucoveSlovo = "insert into dielo_klucove_slovo (dielo_id, klucove_slovo_id) values (?,?)";
-
     private Statement statement;
     private PreparedStatement psDielo;
     private PreparedStatement psDieloOhlas;
@@ -45,6 +28,10 @@ public class FBERG_LF_DB {
     private PreparedStatement psKlucoveSlovoId;
     private PreparedStatement psDieloKlucoveSlovo;
     private PreparedStatement psUpdatePocetStran;
+
+    private PreparedStatement psDieloPracovisko;
+    private PreparedStatement psPodiel;
+
     private Hashtable<String, Integer> kategorie = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> pracoviska = new Hashtable<String, Integer>();
 
@@ -53,10 +40,10 @@ public class FBERG_LF_DB {
         selectKategorie();
         selectPracoviska();
 
-        System.out.println("Kategorie:");
-        for (String s : kategorie.keySet()) {
-            System.out.print(s+", ");
-        }
+//        System.out.println("Kategorie:");
+//        for (String s : kategorie.keySet()) {
+//            System.out.print(s+", ");
+//        }
     }
 
     public static FBERG_LF_DB getInstance(){
@@ -131,6 +118,8 @@ public class FBERG_LF_DB {
         }
     }
 
+    private String sDielo = "select dielo_id from diela where archivacne_cislo = ?";
+
     public ResultSet selectDielo(String archivacneCislo){
         ResultSet rs = null;
         try {
@@ -141,6 +130,10 @@ public class FBERG_LF_DB {
         }
         return rs;
     }
+
+    private String iDielo = "insert into diela " +
+            "(archivacne_cislo, rok_vydania, nazov, podnazov,ISBN, ISSN, miesto_vydania, odkaz, strany, vydanie, kategoria_id) " +
+            "values (?,?,?,?,?,?,?,?,?,?,?)";
 
     public ResultSet insertIntoDiela(Dielo dielo) {
         ResultSet rs = null;
@@ -168,6 +161,8 @@ public class FBERG_LF_DB {
         return rs;
     }
 
+    private String iDieloOhlas = "insert into dielo_ohlas (dielo_id, ohlas_id) values (?,?)";
+
     public void insertIntoDieloOhlas(Integer dielo_id, Integer ohlas_id){
         try {
             psDieloOhlas.setInt(1, dielo_id);
@@ -178,6 +173,9 @@ public class FBERG_LF_DB {
             e.printStackTrace();
         }
     }
+
+    private String iAutor = "insert into autori (meno, priezvisko) values (?,?)";
+    private String sAutor = "select autor_id from autori where meno = ? and priezvisko = ?";
 
     public ResultSet insertIntoAutori(Autor autor){
         ResultSet rs = null;
@@ -203,6 +201,8 @@ public class FBERG_LF_DB {
         return rs;
     }
 
+    private String iAutorDieloPracovisko = "insert into autor_dielo_pracovisko (autor_id, dielo_id, pracovisko_id, percentualny_podiel) values (?,?,?,?)";
+
     public void insertIntoAutorDieloPracovisko(Integer autor_id, Integer dielo_id, Integer pracovisko_id, Integer percentualny_podiel){
         try {
             psAutorDieloPracovisko.setInt(1, autor_id);
@@ -221,6 +221,8 @@ public class FBERG_LF_DB {
         }
     }
 
+    private String sAutorIdAPodielAPracovisko = "select autor_id, percentualny_podiel, pracovisko_id from autor_dielo_pracovisko where dielo_id = ?";
+
     public ResultSet selectAutorIdAPodielAPracoviskoByDielo(Integer dielo_id){
         ResultSet rs = null;
 
@@ -233,6 +235,8 @@ public class FBERG_LF_DB {
 
         return rs;
     }
+
+    private String iOhlas = "insert into ohlasy (rok_vydania, nazov, ISBN, ISSN, miesto_vydania, strany, kategorie_ohlasov_id) values (?,?,?,?,?,?,?)";
 
     public ResultSet insertIntoOhlasy(Ohlas ohlas){
         ResultSet rs = null;
@@ -253,6 +257,8 @@ public class FBERG_LF_DB {
         }
         return rs;
     }
+
+    private String iAutorOhlas = "insert into autor_ohlas (autor_id, ohlas_id) values (?,?)";
 
     public void insertIntoAutorOhlas(Integer autor_id, Integer ohlas_id){
         try {
@@ -279,6 +285,8 @@ public class FBERG_LF_DB {
             e.printStackTrace();
         }
     }
+
+    private String sOhlas = "select ohlas_id from ohlasy where nazov = ? and rok_vydania = ?";
 
     public ResultSet selectOhlas(String nazov, Integer rok){
         ResultSet rs = null;
@@ -320,6 +328,8 @@ public class FBERG_LF_DB {
         }
     }
 
+    private String iKlucoveSlova = "insert into klucove_slova (klucove_slovo) values (?)";
+
     public ResultSet insertIntoKlucove_slova(String klucove_slovo){
         ResultSet rs = null;
 
@@ -341,6 +351,8 @@ public class FBERG_LF_DB {
         return rs;
     }
 
+    private String iDieloKlucoveSlovo = "insert into dielo_klucove_slovo (dielo_id, klucove_slovo_id) values (?,?)";
+
     public void insertIntoDieloKlucoveSlova(Integer dielo_id, Integer klucove_slovo_id){
         try {
             psDieloKlucoveSlovo.setInt(1, dielo_id);
@@ -351,6 +363,8 @@ public class FBERG_LF_DB {
             e.printStackTrace();
         }
     }
+
+    private String klucoveSlovoId = "select klucove_slovo_id from klucove_slova where klucove_slovo = ?";
 
     public ResultSet selectKlucove_slova(){
         String query = "select dielo_id, klucove_slova from diela where klucove_slova is not null";
@@ -378,33 +392,14 @@ public class FBERG_LF_DB {
         return rs;
     }
 
-    // FBERG_LF
-//    private String sDieloPracovisko = "select percentualny_podiel from autor_dielo_pracovisko where dielo_id = ? and pracovisko_id = ?";
-//    private PreparedStatement psDieloPracovisko;
-//
-//    public ResultSet selectPodiel(int dieloId, int pracoviskoId){
-//        ResultSet rs = null;
-//
-//        try {
-//            psDieloPracovisko.setInt(1, dieloId);
-//            psDieloPracovisko.setInt(2, pracoviskoId);
-//            rs = psDieloPracovisko.executeQuery();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return rs;
-//    }
-
-    //
-    private String sDieloPracovisko = "select contribution from author_publication where id_publication = ?";
-    private PreparedStatement psDieloPracovisko;
+    private String sDieloPracovisko = "select percentualny_podiel from autor_dielo_pracovisko where dielo_id = ? and pracovisko_id = ?";
 
     public ResultSet selectPodiel(int dieloId, int pracoviskoId){
         ResultSet rs = null;
 
         try {
             psDieloPracovisko.setInt(1, dieloId);
+            psDieloPracovisko.setInt(2, pracoviskoId);
             rs = psDieloPracovisko.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -414,7 +409,6 @@ public class FBERG_LF_DB {
     }
 
     private String uPodiel = "update autor_dielo_pracovisko set percentualny_podiel = ? where autor_id = ? and dielo_id = ? and pracovisko_id = ?";
-    private PreparedStatement psPodiel;
 
     public int updatePodiel(int podiel, int autorId, int dieloId, int pracoviskoId){
         int rows = -1;
@@ -431,7 +425,6 @@ public class FBERG_LF_DB {
     }
 
     public ResultSet selectStrany(){
-        //query treba menit pre kazdu DB podla potreby!
         String query = "select dielo_id, strany from diela where strany is not null";
         ResultSet rs = null;
 
