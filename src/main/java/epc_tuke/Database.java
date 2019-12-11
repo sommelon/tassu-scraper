@@ -7,9 +7,9 @@ import java.util.Hashtable;
 
 public class Database {
     private static Database singleInstance = null;
-    private final String url = "jdbc:mysql://localhost:3306/tassu?useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private final String url = "jdbc:mysql://localhost:3306/fberg_lf?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
-    private final String pass  = "qwer";
+    private final String pass  = "root";
     private Connection con = null;
 
     private String sDielo = "select dielo_id from diela where archivacne_cislo = ?";
@@ -28,6 +28,19 @@ public class Database {
     private String iKlucoveSlova = "insert into klucove_slova (klucove_slovo) values (?)";
     private String klucoveSlovoId = "select klucove_slovo_id from klucove_slova where klucove_slovo = ?";
     private String iDieloKlucoveSlovo = "insert into dielo_klucove_slovo (dielo_id, klucove_slovo_id) values (?,?)";
+    private String updatePocetStran = "UPDATE diela set strany = ? where dielo_id = ?";
+
+    public void setCon(Connection con) {
+        this.con = con;
+    }
+
+    public Statement getStatement() {
+        return statement;
+    }
+
+    public void setStatement(Statement statement) {
+        this.statement = statement;
+    }
 
     private Statement statement;
     private PreparedStatement psDielo;
@@ -44,7 +57,7 @@ public class Database {
     private PreparedStatement psKlucoveSlova;
     private PreparedStatement psKlucoveSlovoId;
     private PreparedStatement psDieloKlucoveSlovo;
-
+    private PreparedStatement psUpdatePocetStran;
     private Hashtable<String, Integer> kategorie = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> pracoviska = new Hashtable<String, Integer>();
 
@@ -93,6 +106,7 @@ public class Database {
                 psKlucoveSlova = con.prepareStatement(iKlucoveSlova, Statement.RETURN_GENERATED_KEYS);
                 psKlucoveSlovoId = con.prepareStatement(klucoveSlovoId);
                 psDieloKlucoveSlovo = con.prepareStatement(iDieloKlucoveSlovo);
+                psUpdatePocetStran = con.prepareStatement(updatePocetStran);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -122,6 +136,7 @@ public class Database {
             psKlucoveSlova.close();
             psKlucoveSlovoId.close();
             psDieloKlucoveSlovo.close();
+            psUpdatePocetStran.close();
             if (con != null)
                 con.close();
         } catch (SQLException e) {
@@ -260,6 +275,19 @@ public class Database {
             psAutorOhlas.setInt(2, ohlas_id);
 
             psAutorOhlas.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void updatePocetStran(int dielo_id, int pocetStran){
+        try {
+            if(pocetStran <= 0 || pocetStran > 1000){
+                psUpdatePocetStran.setNull(1,Types.INTEGER);
+            }else{
+                psUpdatePocetStran.setInt(1, pocetStran);
+            }
+            psUpdatePocetStran.setInt(2,dielo_id);
+            psUpdatePocetStran.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -24,15 +24,20 @@ public class SpocitanieStran {
                     int stranaOd = Integer.parseInt(m.group(1));
                     int stranaDo = Integer.parseInt(m.group(2));
                     pocetStran = stranaDo - stranaOd;
+                    if(pocetStran == 0){
+                        pocetStran = 1;
+                    }
                 }
             }else{
                 pocetStran = 1;
             }
 
-            if (pocetStran > 0 && pocetStran < 1000) {
+
                 //TODO zapisat do nejakej tabulky alebo rovno do star schemy
+
+                db.updatePocetStran(dieloId,pocetStran);
                 System.out.println("Dielo " + dieloId + " ma " + pocetStran + " stran.");
-            }
+
         }
     }
 }
