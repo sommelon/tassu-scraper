@@ -1,4 +1,5 @@
 .idea/
 scraper.iml
+selenium.iml
 target/
 .gitignore
