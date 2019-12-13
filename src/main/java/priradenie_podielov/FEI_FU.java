@@ -1,21 +1,20 @@
 package priradenie_podielov;
 
-import databases.FBERG_LF_DB;
+import databases.FEI_FU_DB;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class FEI_FU {
     public static void main(String[] args) throws SQLException {
-        FBERG_LF_DB db = FBERG_LF_DB.getInstance();
-        ResultSet rs = db.selectAutorDieloPracovisko();
+        FEI_FU_DB db = FEI_FU_DB.getInstance();
+        ResultSet rs = db.selectAutorDielo();
 
         while (rs.next()){
             int autorId = rs.getInt(1);
             int dieloId = rs.getInt(2);
-            int pracoviskoId = rs.getInt(3);
 
-            ResultSet rs2 = db.selectPodiel(dieloId, pracoviskoId);
+            ResultSet rs2 = db.selectPodiel(dieloId);
             int pocetAutorovBezPodielu = 0;
             int podielDokopy = 0;
 
@@ -27,16 +26,15 @@ public class FEI_FU {
                 podielDokopy += podiel;
             }
 
-            if (pocetAutorovBezPodielu == 1){ //ak je len jeden autor, ktory nema podiel, dopocita sa a updatne v DB
-                int podielAutora = 100 - podielDokopy;
-                db.updatePodiel(podielAutora, autorId, dieloId, pracoviskoId);
-                System.out.println("Autorovi "+ autorId +" bol prideleny podiel " +podielAutora+ " na diele "+ dieloId);
-            } else {
-                int podielAutora = (int) Math.floor((100 - podielDokopy) / pocetAutorovBezPodielu);
-                db.updatePodiel(podielAutora, autorId, dieloId, pracoviskoId);
-                System.out.println("Pre dielo "+ dieloId +" je viac autorov bez podielu. " +
-                        "Autorovi "+ autorId +" bol priradeny podiel "+ podielAutora);
+            if (podielDokopy >= 100){ //podiel ostane taky aky bol
+                continue;
             }
+
+            int podielAutora = (int) Math.floor((100 - podielDokopy) / pocetAutorovBezPodielu);
+            db.updatePodiel(podielAutora, autorId, dieloId);
+            System.out.println("Autorovi "+ autorId +" bol prideleny podiel " +podielAutora+ " na diele "+ dieloId);
         }
+
+
     }
 }

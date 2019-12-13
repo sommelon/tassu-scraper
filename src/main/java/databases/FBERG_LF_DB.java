@@ -7,7 +7,7 @@ import java.util.Hashtable;
 
 public class FBERG_LF_DB {
     private static FBERG_LF_DB singleInstance = null;
-    private final String url = "jdbc:mysql://localhost:3306/fberg_lf?useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private final String url = "jdbc:mysql://localhost:3306/old?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "root";
     private Connection con = null;
@@ -29,8 +29,8 @@ public class FBERG_LF_DB {
     private PreparedStatement psDieloKlucoveSlovo;
     private PreparedStatement psUpdatePocetStran;
 
-    private PreparedStatement psDieloPracovisko;
-    private PreparedStatement psPodiel;
+    private PreparedStatement psPodielSelect;
+    private PreparedStatement psPodielUpdate;
 
     private Hashtable<String, Integer> kategorie = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> pracoviska = new Hashtable<String, Integer>();
@@ -75,8 +75,8 @@ public class FBERG_LF_DB {
                 psAutorIdAPodielAPracoviskoByDielo = con.prepareStatement(sAutorIdAPodielAPracovisko);
                 psAutorDieloPracovisko = con.prepareStatement(iAutorDieloPracovisko);
 
-                psPodiel = con.prepareStatement(uPodiel);
-                psDieloPracovisko = con.prepareStatement(sDieloPracovisko);
+                psPodielUpdate = con.prepareStatement(uPodiel);
+                psPodielSelect = con.prepareStatement(sPodiel);
                 psKlucoveSlova = con.prepareStatement(iKlucoveSlova, Statement.RETURN_GENERATED_KEYS);
                 psKlucoveSlovoId = con.prepareStatement(klucoveSlovoId);
                 psDieloKlucoveSlovo = con.prepareStatement(iDieloKlucoveSlovo);
@@ -105,8 +105,8 @@ public class FBERG_LF_DB {
             psAutorIdAPodielAPracoviskoByDielo.close();
             psAutorDieloPracovisko.close();
 
-            psPodiel.close();
-            psDieloPracovisko.close();
+            psPodielUpdate.close();
+            psPodielSelect.close();
             psKlucoveSlova.close();
             psKlucoveSlovoId.close();
             psDieloKlucoveSlovo.close();
@@ -392,15 +392,15 @@ public class FBERG_LF_DB {
         return rs;
     }
 
-    private String sDieloPracovisko = "select percentualny_podiel from autor_dielo_pracovisko where dielo_id = ? and pracovisko_id = ?";
+    private String sPodiel = "select percentualny_podiel from autor_dielo_pracovisko where dielo_id = ? and pracovisko_id = ?";
 
     public ResultSet selectPodiel(int dieloId, int pracoviskoId){
         ResultSet rs = null;
 
         try {
-            psDieloPracovisko.setInt(1, dieloId);
-            psDieloPracovisko.setInt(2, pracoviskoId);
-            rs = psDieloPracovisko.executeQuery();
+            psPodielSelect.setInt(1, dieloId);
+            psPodielSelect.setInt(2, pracoviskoId);
+            rs = psPodielSelect.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -413,11 +413,11 @@ public class FBERG_LF_DB {
     public int updatePodiel(int podiel, int autorId, int dieloId, int pracoviskoId){
         int rows = -1;
         try {
-            psPodiel.setInt(1, podiel);
-            psPodiel.setInt(2, autorId);
-            psPodiel.setInt(3, dieloId);
-            psPodiel.setInt(4, pracoviskoId);
-            rows = psPodiel.executeUpdate();
+            psPodielUpdate.setInt(1, podiel);
+            psPodielUpdate.setInt(2, autorId);
+            psPodielUpdate.setInt(3, dieloId);
+            psPodielUpdate.setInt(4, pracoviskoId);
+            rows = psPodielUpdate.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

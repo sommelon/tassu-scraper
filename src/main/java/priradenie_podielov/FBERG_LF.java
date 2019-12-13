@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class FBERG_LF {
     public static void main(String[] args) throws SQLException {
         FBERG_LF_DB db = FBERG_LF_DB.getInstance();
-        ResultSet rs = db.selectAutorDieloPracovisko();
+        ResultSet rs = db.selectAutorDieloPracovisko(); //select len tych co nemaju podiel
 
         while (rs.next()){
             int autorId = rs.getInt(1);
@@ -19,6 +19,7 @@ public class FBERG_LF {
             int pocetAutorovBezPodielu = 0;
             int podielDokopy = 0;
 
+            //pocitanie podielu a autorov bez podielu pre dane dielo v danom pracovisku
             while (rs2.next()){
                 int podiel = rs2.getInt(1);
                 if (podiel == 0){
@@ -27,16 +28,14 @@ public class FBERG_LF {
                 podielDokopy += podiel;
             }
 
-            if (pocetAutorovBezPodielu == 1){ //ak je len jeden autor, ktory nema podiel, dopocita sa a updatne v DB
-                int podielAutora = 100 - podielDokopy;
-                db.updatePodiel(podielAutora, autorId, dieloId, pracoviskoId);
-                System.out.println("Autorovi "+ autorId +" bol prideleny podiel " +podielAutora+ " na diele "+ dieloId);
-            } else {
-                int podielAutora = (int) Math.floor((100 - podielDokopy) / pocetAutorovBezPodielu);
-                db.updatePodiel(podielAutora, autorId, dieloId, pracoviskoId);
-                System.out.println("Pre dielo "+ dieloId +" je viac autorov bez podielu. " +
-                        "Autorovi "+ autorId +" bol priradeny podiel "+ podielAutora);
+            if (podielDokopy >= 100){ //podiel zostane taky aky bol
+                continue;
             }
+
+            int podielAutora = (int) Math.floor((100 - podielDokopy) / pocetAutorovBezPodielu);
+            db.updatePodiel(podielAutora, autorId, dieloId, pracoviskoId);
+            System.out.println("Autorovi " + autorId + " bol prideleny podiel " + podielAutora + " na diele " + dieloId);
+            System.out.println("Podiel dokopy: "+ podielDokopy +". Pocet autorov bez podielu: "+ pocetAutorovBezPodielu);
         }
     }
 }
