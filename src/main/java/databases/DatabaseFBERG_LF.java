@@ -5,8 +5,8 @@ import tabulky.*;
 import java.sql.*;
 import java.util.Hashtable;
 
-public class FBERG_LF_DB {
-    private static FBERG_LF_DB singleInstance = null;
+public class DatabaseFBERG_LF {
+    private static DatabaseFBERG_LF singleInstance = null;
     private final String url = "jdbc:mysql://localhost:3306/old?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "root";
@@ -35,7 +35,7 @@ public class FBERG_LF_DB {
     private Hashtable<String, Integer> kategorie = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> pracoviska = new Hashtable<String, Integer>();
 
-    private FBERG_LF_DB(){
+    private DatabaseFBERG_LF(){
         openConnection();
         selectKategorie();
         selectPracoviska();
@@ -46,9 +46,9 @@ public class FBERG_LF_DB {
 //        }
     }
 
-    public static FBERG_LF_DB getInstance(){
+    public static DatabaseFBERG_LF getInstance(){
         if(singleInstance == null)
-            singleInstance = new FBERG_LF_DB();
+            singleInstance = new DatabaseFBERG_LF();
 
         return singleInstance;
     }

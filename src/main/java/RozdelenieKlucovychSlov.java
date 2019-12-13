@@ -1,4 +1,4 @@
-import databases.FBERG_LF_DB;
+import databases.DatabaseFBERG_LF;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class RozdelenieKlucovychSlov {
     public static void main(String[] args) throws SQLException {
-        FBERG_LF_DB db = FBERG_LF_DB.getInstance();
+        DatabaseFBERG_LF db = DatabaseFBERG_LF.getInstance();
         ResultSet rs = db.selectKlucove_slova();
         Pattern znakyNaStranachP = Pattern.compile("^ +| $");
 

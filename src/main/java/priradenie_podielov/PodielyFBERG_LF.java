@@ -1,13 +1,13 @@
 package priradenie_podielov;
 
-import databases.FBERG_LF_DB;
+import databases.DatabaseFBERG_LF;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class FBERG_LF {
+public class PodielyFBERG_LF {
     public static void main(String[] args) throws SQLException {
-        FBERG_LF_DB db = FBERG_LF_DB.getInstance();
+        DatabaseFBERG_LF db = DatabaseFBERG_LF.getInstance();
         ResultSet rs = db.selectAutorDieloPracovisko(); //select len tych co nemaju podiel
 
         while (rs.next()){

@@ -2,8 +2,8 @@ package databases;
 
 import java.sql.*;
 
-public class FEI_FU_DB {
-    private static FEI_FU_DB singleInstance = null;
+public class DatabaseFEI_FU {
+    private static DatabaseFEI_FU singleInstance = null;
     private final String url = "jdbc:mysql://localhost:3306/fei_fu?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "root";
@@ -13,13 +13,13 @@ public class FEI_FU_DB {
     private PreparedStatement psPodielSelect;
     private PreparedStatement psPodielUpdate;
 
-    private FEI_FU_DB(){
+    private DatabaseFEI_FU(){
         openConnection();
     }
 
-    public static FEI_FU_DB getInstance(){
+    public static DatabaseFEI_FU getInstance(){
         if(singleInstance == null)
-            singleInstance = new FEI_FU_DB();
+            singleInstance = new DatabaseFEI_FU();
 
         return singleInstance;
     }

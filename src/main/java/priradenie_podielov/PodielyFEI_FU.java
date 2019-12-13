@@ -1,13 +1,13 @@
 package priradenie_podielov;
 
-import databases.FEI_FU_DB;
+import databases.DatabaseFEI_FU;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class FEI_FU {
+public class PodielyFEI_FU {
     public static void main(String[] args) throws SQLException {
-        FEI_FU_DB db = FEI_FU_DB.getInstance();
+        DatabaseFEI_FU db = DatabaseFEI_FU.getInstance();
         ResultSet rs = db.selectAutorDielo();
 
         while (rs.next()){

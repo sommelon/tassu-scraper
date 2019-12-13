@@ -1,6 +1,6 @@
 package star_schema;
 
-public class FVT_FMMR {
+public class StarSchemeSF_EF {
     public static void main(String[] args) {
 
     }

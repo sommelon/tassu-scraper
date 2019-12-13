@@ -2,9 +2,9 @@ package databases;
 
 import java.sql.*;
 
-public class REKT_SJF_DB {
-    private static REKT_SJF_DB singleInstance = null;
-    private final String url = "jdbc:mysql://localhost:3306/rekt_sjf?useLegacyDatetimeCode=false&serverTimezone=UTC";
+public class DatabaseFVT_FMMR {
+    private static DatabaseFVT_FMMR singleInstance = null;
+    private final String url = "jdbc:mysql://localhost:3306/fvt_fmmr?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "root";
     private Connection con = null;
@@ -13,18 +13,17 @@ public class REKT_SJF_DB {
     private PreparedStatement psPocetStranToNull;
     private PreparedStatement psPocetEmptyStranToNull;
 
-    private REKT_SJF_DB(){
+    private DatabaseFVT_FMMR(){
         openConnection();
     }
 
-    public static REKT_SJF_DB getInstance(){
+    public static DatabaseFVT_FMMR getInstance(){
         if(singleInstance == null)
-            singleInstance = new REKT_SJF_DB();
+            singleInstance = new DatabaseFVT_FMMR();
 
         return singleInstance;
     }
-    //TODO Convert pages to correct form
-    private String updatePocetStran = "UPDATE epcs set numberOfPages = ? where id = ?";
+    private String updatePocetStran = "UPDATE zaznam set pocet_stran = ? where idZaznam = ?";
     public void updatePocetStran(int dielo_id, int pocetStran){
         try {
             if(pocetStran <= 0 || pocetStran > 1000){
@@ -39,7 +38,7 @@ public class REKT_SJF_DB {
         }
     }
     public ResultSet selectStrany(){
-        String query = "select id, numberOfPages from epcs where numberOfPages is not null";
+        String query = "select idZaznam, pocet_stran from zaznam where pocet_stran is not null";
         ResultSet rs = null;
 
         try {
@@ -50,15 +49,15 @@ public class REKT_SJF_DB {
 
         return rs;
     }
-    private String pocetStranToNull = "UPDATE epcs set numberOfPages = REPLACE(numberOfPages,'null',null) where numberOfPages like 'null'";
-    private String pocetEmptyStranToNull = "UPDATE epcs set numberOfPages = REPLACE(numberOfPages,'',null) where numberOfPages like ''";
+    private String pocetStranToNull = "UPDATE zaznam set pocet_stran = REPLACE(pocet_stran,'null',null) where pocet_stran like 'null'";
+    private String pocetEmptyStranToNull = "UPDATE zaznam set pocet_stran = REPLACE(pocet_stran,'',null) where pocet_stran like ''";
     public void convertToNull(){
-       try {
-           psPocetEmptyStranToNull.executeUpdate();
-           psPocetStranToNull.executeUpdate();
-       } catch (SQLException e) {
-           e.printStackTrace();
-       }
+        try {
+            psPocetEmptyStranToNull.executeUpdate();
+            psPocetStranToNull.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -80,6 +79,5 @@ public class REKT_SJF_DB {
                 e.printStackTrace();
             }
         }
-
     }
 }

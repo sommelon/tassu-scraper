@@ -1,50 +1,48 @@
-import databases.REKT_SJF_DB;
+package pocet_stran;
+
+import databases.DatabaseFBERG_LF;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SpocitanieStranREKT_SEJF_DB {
-
+public class SpocitanieStranFBERG_LF {
     public static void main(String[] args) throws SQLException {
-
-        REKT_SJF_DB rekt_sjf_db = REKT_SJF_DB.getInstance();
-        ResultSet rs = rekt_sjf_db.selectStrany();
+        DatabaseFBERG_LF db = DatabaseFBERG_LF.getInstance();
+        ResultSet rs = db.selectStrany();
         Pattern rozsahStranP = Pattern.compile("([0-9]+) ?- ?([0-9]+)?");
         Matcher m;
-        rekt_sjf_db.convertToNull();
-        while (rs.next()) {
+
+        while(rs.next()){
             int dieloId = rs.getInt(1);
             int pocetStran = -1;
             String strany = rs.getString(2);
 
-            if (strany.contains("-")) {
+            if (strany.contains("-")){
                 System.out.print("Rozsah - ");
                 m = rozsahStranP.matcher(strany);
                 if (m.find()) {
-                    if (isNumeric(m.group(1)) && isNumeric(m.group(2))) {
-                        int stranaOd = Integer.parseInt(m.group(1));
-                        int stranaDo = Integer.parseInt(m.group(2));
-                        pocetStran = stranaDo - stranaOd;
-                        if (pocetStran == 0) {
-                            pocetStran = 1;
-                        }
+                    int stranaOd = Integer.parseInt(m.group(1));
+                    int stranaDo = Integer.parseInt(m.group(2));
+                    pocetStran = stranaDo - stranaOd;
+                    if(pocetStran == 0){
+                        pocetStran = 1;
                     }
                 }
-            } else {
+            }else{
                 pocetStran = 1;
             }
 
-            rekt_sjf_db.updatePocetStran(dieloId, pocetStran);
+            db.updatePocetStran(dieloId,pocetStran);
             System.out.println("Dielo " + dieloId + " ma " + pocetStran + " stran.");
-
         }
+
+
+
     }
-
-
     public static boolean isNumeric(String str) {
-        if (str != null) {
+        if(str !=null) {
             try {
                 Double.parseDouble(str);
                 return true;
@@ -54,5 +52,4 @@ public class SpocitanieStranREKT_SEJF_DB {
         }
         return false;
     }
-
 }

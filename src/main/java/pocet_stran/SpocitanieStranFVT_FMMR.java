@@ -1,20 +1,22 @@
-import databases.FVT_FMMR_DB;
+package pocet_stran;
+
+import databases.DatabaseFVT_FMMR;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SpocitanieStranFVT_FMMR_DB {
+public class SpocitanieStranFVT_FMMR {
 
 
         public static void main(String[] args) throws SQLException {
 
-            FVT_FMMR_DB fvt_fmmr_db = FVT_FMMR_DB.getInstance();
-            ResultSet rs = fvt_fmmr_db.selectStrany();
+            DatabaseFVT_FMMR databaseFvt_fmmr_ = DatabaseFVT_FMMR.getInstance();
+            ResultSet rs = databaseFvt_fmmr_.selectStrany();
             Pattern rozsahStranP = Pattern.compile("([0-9]+) ?- ?([0-9]+)?");
             Matcher m;
-            fvt_fmmr_db.convertToNull();
+            databaseFvt_fmmr_.convertToNull();
             while (rs.next()) {
                 int dieloId = rs.getInt(1);
                 int pocetStran = -1;
@@ -37,7 +39,7 @@ public class SpocitanieStranFVT_FMMR_DB {
                     pocetStran = 1;
                 }
 
-                fvt_fmmr_db.updatePocetStran(dieloId, pocetStran);
+                databaseFvt_fmmr_.updatePocetStran(dieloId, pocetStran);
                 System.out.println("Dielo " + dieloId + " ma " + pocetStran + " stran.");
 
             }

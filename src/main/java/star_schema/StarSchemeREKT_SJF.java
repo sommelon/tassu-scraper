@@ -1,6 +1,6 @@
 package star_schema;
 
-public class FEI_FU {
+public class StarSchemeREKT_SJF {
     public static void main(String[] args) {
 
     }

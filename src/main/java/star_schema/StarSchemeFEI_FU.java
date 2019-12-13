@@ -1,6 +1,6 @@
-package priradenie_podielov;
+package star_schema;
 
-public class REKT_SJF {
+public class StarSchemeFEI_FU {
     public static void main(String[] args) {
 
     }

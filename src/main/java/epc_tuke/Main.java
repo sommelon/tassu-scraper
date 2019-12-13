@@ -1,6 +1,6 @@
 package epc_tuke;
 
-import databases.FBERG_LF_DB;
+import databases.DatabaseFBERG_LF;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -15,7 +15,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        FBERG_LF_DB db = FBERG_LF_DB.getInstance();
+        DatabaseFBERG_LF db = DatabaseFBERG_LF.getInstance();
 
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
         ChromeOptions options = new ChromeOptions();

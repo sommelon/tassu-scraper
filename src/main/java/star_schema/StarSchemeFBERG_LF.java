@@ -1,6 +1,6 @@
-package priradenie_podielov;
+package star_schema;
 
-public class SF_EF {
+public class StarSchemeFBERG_LF {
     public static void main(String[] args) {
 
     }

@@ -4,20 +4,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class SF_EF_DB {
-    private static SF_EF_DB singleInstance = null;
+public class DatabaseSF_EF {
+    private static DatabaseSF_EF singleInstance = null;
     private final String url = "jdbc:mysql://localhost:3306/sf_ef?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "root";
     private Connection con = null;
 
-    private SF_EF_DB(){
+    private DatabaseSF_EF(){
         openConnection();
     }
 
-    public static SF_EF_DB getInstance(){
+    public static DatabaseSF_EF getInstance(){
         if(singleInstance == null)
-            singleInstance = new SF_EF_DB();
+            singleInstance = new DatabaseSF_EF();
 
         return singleInstance;
     }
