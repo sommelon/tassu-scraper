@@ -21,6 +21,7 @@ public class SF_EF_DB {
 
         return singleInstance;
     }
+    // Pages are in the correct form
 
     private void openConnection() {
         if (con == null) {
