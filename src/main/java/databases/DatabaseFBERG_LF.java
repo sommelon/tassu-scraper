@@ -1,5 +1,6 @@
 package databases;
 
+import crepc.CREPC2scraper;
 import tabulky.*;
 
 import java.sql.*;
@@ -34,6 +35,7 @@ public class DatabaseFBERG_LF {
 
     private Hashtable<String, Integer> kategorie = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> pracoviska = new Hashtable<String, Integer>();
+    private PreparedStatement psGetDataForScheme;
 
     private DatabaseFBERG_LF(){
         openConnection();
@@ -81,6 +83,7 @@ public class DatabaseFBERG_LF {
                 psKlucoveSlovoId = con.prepareStatement(klucoveSlovoId);
                 psDieloKlucoveSlovo = con.prepareStatement(iDieloKlucoveSlovo);
                 psUpdatePocetStran = con.prepareStatement(updatePocetStran);
+                psGetDataForScheme = con.prepareStatement(getDataForSchemeString, Statement.RETURN_GENERATED_KEYS);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -111,6 +114,7 @@ public class DatabaseFBERG_LF {
             psKlucoveSlovoId.close();
             psDieloKlucoveSlovo.close();
             psUpdatePocetStran.close();
+            psGetDataForScheme.close();
             if (con != null)
                 con.close();
         } catch (SQLException e) {
@@ -130,6 +134,22 @@ public class DatabaseFBERG_LF {
         }
         return rs;
     }
+    String getDataForSchemeString = "select a.dielo_id, a.nazov, a.isbn, a.issn, a.miesto_vydania, a.vydanie, a.archivacne_cislo , a.rok_vydania , c.nazov, d.nazov, d.skratka , e.meno, e.priezvisko, f.popis, f.kod, a.strany " +
+            "  from fberg_lf.diela a join fberg_lf.autor_dielo_pracovisko b on a.dielo_id = b.dielo_id join  fberg_lf.pracoviska c on b.pracovisko_id = c.pracovisko_id join fberg_lf.fakulty d on c.fakulta_id = d.fakulta_id  join  fberg_lf.autori e on b.autor_id = e.autor_id join fberg_lf.kategorie f on a.kategoria_id = f.kategoria_id;";
+
+    public ResultSet getDataForStarSchema(){
+
+        ResultSet rs = null;
+        try {
+
+            rs = psGetDataForScheme.executeQuery();
+    }
+        catch (SQLException e){
+        e.printStackTrace();
+    }
+        return rs;
+}
+
 
     private String iDielo = "insert into diela " +
             "(archivacne_cislo, rok_vydania, nazov, podnazov,ISBN, ISSN, miesto_vydania, odkaz, strany, vydanie, kategoria_id) " +
@@ -160,6 +180,8 @@ public class DatabaseFBERG_LF {
 
         return rs;
     }
+
+
 
     private String iDieloOhlas = "insert into dielo_ohlas (dielo_id, ohlas_id) values (?,?)";
 
@@ -377,6 +399,28 @@ public class DatabaseFBERG_LF {
         }
 
         return rs;
+    }
+
+    public String getKlucoveSlova(int dieloId){
+        String query = "select a.dielo_id, b.klucove_slovo from fberg_lf.dielo_klucove_slovo a join fberg_lf.klucove_slova b on a.klucove_slovo_id = b.klucove_slovo_id where dielo_id = " +dieloId;
+        ResultSet rs=null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            rs = statement.executeQuery(query);
+            while (rs.next()){
+                stringBuilder.append(rs.getString(2));
+                stringBuilder.append(", ");
+            }
+            if(stringBuilder.length()>2) {
+                stringBuilder.substring(0, stringBuilder.length() - 3);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
+
+
     }
 
     public ResultSet selectAutorDieloPracovisko(){
