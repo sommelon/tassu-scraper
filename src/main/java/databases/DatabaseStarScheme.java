@@ -22,6 +22,7 @@ public class DatabaseStarScheme {
     private PreparedStatement psSelectAutor;
     private PreparedStatement psSelectCas;
     private Statement statement;
+    private PreparedStatement psSelectDielo;
 
     private DatabaseStarScheme() {
         openConnection();
@@ -49,6 +50,7 @@ public class DatabaseStarScheme {
                 psSelectKategoria = con.prepareStatement(selectKategoria, Statement.RETURN_GENERATED_KEYS);
                 psSelectAutor = con.prepareStatement(selectAutor, Statement.RETURN_GENERATED_KEYS);
                 psSelectCas = con.prepareStatement(selectCas,Statement.RETURN_GENERATED_KEYS);
+                psSelectDielo = con.prepareStatement(selectDielo,Statement.RETURN_GENERATED_KEYS);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -66,6 +68,7 @@ public class DatabaseStarScheme {
         }
     }
 
+    private String selectDielo = "select dieloId from dielo where nazov = ?";
 
     private String iDielo = "insert into dielo " +
             "(archivacne_cislo, rok_vydania, nazov,ISBN, ISSN, miesto_vydania, vydanie, klucove_slova) " +
@@ -74,22 +77,28 @@ public class DatabaseStarScheme {
     public ResultSet insertIntoDiela(Dielo dielo) {
         ResultSet rs = null;
         try {
+            psSelectDielo.setString(1, dielo.getNazov());
+            ResultSet rsSelectDielo = psSelectDielo.executeQuery();
+            if (!rsSelectDielo.next()) {
+                psDielo.setString(1, dielo.getArchivacne_cislo());
+                psDielo.setString(2, dielo.getRok_vydania());
+                psDielo.setString(3, dielo.getNazov());
+                psDielo.setString(4, dielo.getISBN());
+                psDielo.setString(5, dielo.getISSN());
+                psDielo.setString(6, dielo.getMiesto_vydania());
+                psDielo.setString(7, dielo.getVydanie());
+                psDielo.setString(8, dielo.getKlucove_slova());
 
-            psDielo.setString(1, dielo.getArchivacne_cislo());
-            psDielo.setString(2, dielo.getRok_vydania());
-            psDielo.setString(3, dielo.getNazov());
-            psDielo.setString(4, dielo.getISBN());
-            psDielo.setString(5, dielo.getISSN());
-            psDielo.setString(6, dielo.getMiesto_vydania());
-            psDielo.setString(7, dielo.getVydanie());
-            psDielo.setString(8,dielo.getKlucove_slova());
+
+                psDielo.executeUpdate();
 
 
-            psDielo.executeUpdate();
-
-
-            rs = psDielo.getGeneratedKeys();
-            rs.next();
+                rs = psDielo.getGeneratedKeys();
+                rs.next();
+            }
+            else {
+                return rsSelectDielo;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
