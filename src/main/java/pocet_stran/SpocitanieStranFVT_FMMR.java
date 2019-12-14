@@ -12,11 +12,11 @@ public class SpocitanieStranFVT_FMMR {
 
         public static void main(String[] args) throws SQLException {
 
-            DatabaseFVT_FMMR databaseFvt_fmmr_ = DatabaseFVT_FMMR.getInstance();
-            ResultSet rs = databaseFvt_fmmr_.selectStrany();
+            DatabaseFVT_FMMR db = DatabaseFVT_FMMR.getInstance();
+            ResultSet rs = db.selectStrany();
             Pattern rozsahStranP = Pattern.compile("([0-9]+) ?- ?([0-9]+)?");
             Matcher m;
-            databaseFvt_fmmr_.convertToNull();
+            db.convertToNull();
             while (rs.next()) {
                 int dieloId = rs.getInt(1);
                 int pocetStran = -1;
@@ -39,7 +39,7 @@ public class SpocitanieStranFVT_FMMR {
                     pocetStran = 1;
                 }
 
-                databaseFvt_fmmr_.updatePocetStran(dieloId, pocetStran);
+                db.updatePocetStran(dieloId, pocetStran);
                 System.out.println("Dielo " + dieloId + " ma " + pocetStran + " stran.");
 
             }

@@ -21,7 +21,6 @@ public class DatabaseSF_EF {
 
         return singleInstance;
     }
-    // Pages are in the correct form
 
     private void openConnection() {
         if (con == null) {
@@ -38,4 +37,6 @@ public class DatabaseSF_EF {
             }
         }
     }
+
+    // Pages are in the correct form
 }

@@ -7,7 +7,7 @@ import java.util.Hashtable;
 
 public class DatabaseFBERG_LF {
     private static DatabaseFBERG_LF singleInstance = null;
-    private final String url = "jdbc:mysql://localhost:3306/old?useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private final String url = "jdbc:mysql://localhost:3306/fberg_lf?useLegacyDatetimeCode=false&serverTimezone=UTC";
     private final String user  = "root";
     private final String pass  = "root";
     private Connection con = null;

@@ -37,9 +37,6 @@ public class SpocitanieStranFBERG_LF {
             db.updatePocetStran(dieloId,pocetStran);
             System.out.println("Dielo " + dieloId + " ma " + pocetStran + " stran.");
         }
-
-
-
     }
     public static boolean isNumeric(String str) {
         if(str !=null) {

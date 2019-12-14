@@ -11,11 +11,11 @@ public class SpocitanieStranREKT_SJF {
 
     public static void main(String[] args) throws SQLException {
 
-        DatabaseREKT_SJF databaseRekt_sjf_ = DatabaseREKT_SJF.getInstance();
-        ResultSet rs = databaseRekt_sjf_.selectStrany();
+        DatabaseREKT_SJF db = DatabaseREKT_SJF.getInstance();
+        ResultSet rs = db.selectStrany();
         Pattern rozsahStranP = Pattern.compile("([0-9]+) ?- ?([0-9]+)?");
         Matcher m;
-        databaseRekt_sjf_.convertToNull();
+        db.convertToNull();
         while (rs.next()) {
             int dieloId = rs.getInt(1);
             int pocetStran = -1;
@@ -38,7 +38,7 @@ public class SpocitanieStranREKT_SJF {
                 pocetStran = 1;
             }
 
-            databaseRekt_sjf_.updatePocetStran(dieloId, pocetStran);
+            db.updatePocetStran(dieloId, pocetStran);
             System.out.println("Dielo " + dieloId + " ma " + pocetStran + " stran.");
 
         }

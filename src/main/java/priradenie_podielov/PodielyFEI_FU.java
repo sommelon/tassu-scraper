@@ -33,8 +33,7 @@ public class PodielyFEI_FU {
             int podielAutora = (int) Math.floor((100 - podielDokopy) / pocetAutorovBezPodielu);
             db.updatePodiel(podielAutora, autorId, dieloId);
             System.out.println("Autorovi "+ autorId +" bol prideleny podiel " +podielAutora+ " na diele "+ dieloId);
+            System.out.println("Podiel dokopy: "+ podielDokopy +". Pocet autorov bez podielu: "+ pocetAutorovBezPodielu);
         }
-
-
     }
 }

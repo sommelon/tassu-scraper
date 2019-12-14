@@ -23,6 +23,27 @@ public class DatabaseFVT_FMMR {
 
         return singleInstance;
     }
+
+    private void openConnection() {
+        if (con == null) {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                con = DriverManager.getConnection(url, user, pass);
+                statement = con.createStatement();
+                psPocetStranToNull = con.prepareStatement(pocetStranToNull);
+                psUpdatePocetStran = con.prepareStatement(updatePocetStran);
+                psPocetEmptyStranToNull = con.prepareStatement(pocetEmptyStranToNull);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private String updatePocetStran = "UPDATE zaznam set pocet_stran = ? where idZaznam = ?";
     public void updatePocetStran(int dielo_id, int pocetStran){
         try {
@@ -59,25 +80,5 @@ public class DatabaseFVT_FMMR {
             e.printStackTrace();
         }
 
-    }
-
-    private void openConnection() {
-        if (con == null) {
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                con = DriverManager.getConnection(url, user, pass);
-                statement = con.createStatement();
-                psPocetStranToNull = con.prepareStatement(pocetStranToNull);
-                psUpdatePocetStran = con.prepareStatement(updatePocetStran);
-                psPocetEmptyStranToNull = con.prepareStatement(pocetEmptyStranToNull);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

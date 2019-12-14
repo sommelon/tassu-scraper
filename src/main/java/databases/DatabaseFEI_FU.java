@@ -60,7 +60,7 @@ public class DatabaseFEI_FU {
     }
 
     public ResultSet selectAutorDielo(){
-        String query = "select id_autor, id_publication from author_publication where contribution is null";
+        String query = "select id_author, id_publication from author_publication where contribution is null";
         ResultSet rs = null;
 
         try {
@@ -87,13 +87,15 @@ public class DatabaseFEI_FU {
         return rs;
     }
 
-    private String uPodiel = "update author_publication set contribution = ? where autor_id = ? and dielo_id = ?";
+    private String uPodiel = "update author_publication set contribution = ? where id_author = ? and id_publication = ?";
 
     public void updatePodiel(int podiel, int autorId, int dieloId){
         try {
             psPodielUpdate.setInt(1, podiel);
             psPodielUpdate.setInt(2, autorId);
             psPodielUpdate.setInt(3, dieloId);
+
+            psPodielUpdate.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
