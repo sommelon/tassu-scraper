@@ -21,10 +21,12 @@ public class StarSchemeFEI_FU {
             dielo.setNazov(rs.getString(1));
             dielo.setPodnazov(rs.getString(2));
             String ISBNISSN = rs.getString(3);
-            if (ISBNISSN.contains("ISBN")){
-                dielo.setISBN(ISBNISSN.substring(5));
-            }else if (ISBNISSN.contains("ISSN")){
-                dielo.setISSN(ISBNISSN.substring(5));
+            if (ISBNISSN != null) {
+                if (ISBNISSN.contains("ISBN")) {
+                    dielo.setISBN(ISBNISSN.substring(5));
+                } else if (ISBNISSN.contains("ISSN")) {
+                    dielo.setISSN(ISBNISSN.substring(5));
+                }
             }
             dielo.setVydanie(rs.getString(4));
             dielo.setRok_vydania(rs.getString(5));
