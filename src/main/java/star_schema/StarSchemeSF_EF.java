@@ -60,7 +60,11 @@ public class StarSchemeSF_EF {
                 ResultSet rsCas = databaseStarScheme.insertIntoCas(rs.getString(7));
                 ResultSet rsKategoria = databaseStarScheme.insertIntoKategoria(katPopis(rs.getString(12)), rs.getString(12));
 
-                databaseStarScheme.insertIntoFact(rsDielo.getInt(1), rsPracovisko.getInt(1), rsAutor.getInt(1), rsKategoria.getInt(1), rsCas.getInt(1), pocetStranNaAutora);
+                try{
+                    databaseStarScheme.insertIntoFact(rsDielo.getInt(1), rsPracovisko.getInt(1), rsAutor.getInt(1), rsKategoria.getInt(1), rsCas.getInt(1), pocetStranNaAutora);
+                }catch (NullPointerException e){
+                    e.printStackTrace();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

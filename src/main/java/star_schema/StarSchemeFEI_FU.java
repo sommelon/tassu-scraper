@@ -70,7 +70,11 @@ public class StarSchemeFEI_FU {
 
             ResultSet rsAutor = dbs.insetIntoAutor(autor);
 
-            dbs.insertIntoFact(rsDielo.getInt(1), rsPracovisko.getInt(1), rsAutor.getInt(1), rsKategoria.getInt(1), rsCasVydania.getInt(1), pocetStranNaAutora);
+            try {
+                dbs.insertIntoFact(rsDielo.getInt(1), rsPracovisko.getInt(1), rsAutor.getInt(1), rsKategoria.getInt(1), rsCasVydania.getInt(1), pocetStranNaAutora);
+            }catch (NullPointerException e){
+                e.printStackTrace();
+            }
         }
     }
 }
