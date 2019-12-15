@@ -257,9 +257,14 @@ public class DatabaseStarScheme {
 
         Pattern rokP = Pattern.compile("[0-9]{4}");
         public ResultSet insertIntoCas (String rok){
-            Matcher m = rokP.matcher(rok);
-            m.find();
-            int rokInt = Integer.parseInt(m.group(0));
+            int rokInt;
+            if (rok.contains("-")) {
+                Matcher m = rokP.matcher(rok);
+                m.find();
+                rokInt = Integer.parseInt(m.group(0));
+            }else {
+                rokInt = Integer.parseInt(rok);
+            }
 
             ResultSet rs = null;
             try {

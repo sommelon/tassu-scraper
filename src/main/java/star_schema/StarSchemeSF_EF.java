@@ -22,7 +22,7 @@ public class StarSchemeSF_EF {
                     miestoVydania = rs.getString(5);
                 }
                 if (rs.getString(15)!=null) {
-                    miestoVydania += miestoVydania != null ? " & "+rs.getString(15) : rs.getString(15);
+                    miestoVydania = miestoVydania != null ? miestoVydania +" & " + rs.getString(15) : rs.getString(15);
                 }
 
                 System.out.println("------------------------------------------------------------\n");

@@ -35,10 +35,10 @@ public class StarSchemeFEI_FU {
                 miestoVydania = rs.getString(6);
             }
             if (rs.getString(7)!=null) {
-                miestoVydania += miestoVydania != null ? " & "+rs.getString(7) : rs.getString(7);
+                miestoVydania = miestoVydania != null ? miestoVydania +" & "+rs.getString(7) : rs.getString(7);
             }
             if (rs.getString(8)!=null) {
-                miestoVydania += miestoVydania != null ? " & "+rs.getString(8) : rs.getString(8);
+                miestoVydania = miestoVydania != null ? miestoVydania +" & "+rs.getString(8) : rs.getString(8);
             }
 
             dielo.setMiesto_vydania(miestoVydania);
