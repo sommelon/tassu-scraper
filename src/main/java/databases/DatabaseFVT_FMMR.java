@@ -12,6 +12,7 @@ public class DatabaseFVT_FMMR {
     private PreparedStatement psUpdatePocetStran;
     private PreparedStatement psPocetStranToNull;
     private PreparedStatement psPocetEmptyStranToNull;
+    private PreparedStatement psGetDataForScheme;
 
     private DatabaseFVT_FMMR(){
         openConnection();
@@ -38,6 +39,7 @@ public class DatabaseFVT_FMMR {
                 psPocetStranToNull = con.prepareStatement(pocetStranToNull);
                 psUpdatePocetStran = con.prepareStatement(updatePocetStran);
                 psPocetEmptyStranToNull = con.prepareStatement(pocetEmptyStranToNull);
+                psGetDataForScheme = con.prepareStatement(sDataForStarScheme);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -80,5 +82,20 @@ public class DatabaseFVT_FMMR {
             e.printStackTrace();
         }
 
+    }
+
+    private String sDataForStarScheme = "";
+
+    public ResultSet getDataForStarScheme(){
+
+        ResultSet rs = null;
+        try {
+
+            rs = psGetDataForScheme.executeQuery();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
     }
 }

@@ -71,8 +71,8 @@ public class DatabaseStarScheme {
     private String selectDielo = "select dieloId from dielo where nazov = ?";
 
     private String iDielo = "insert into dielo " +
-            "(archivacne_cislo, rok_vydania, nazov,ISBN, ISSN, miesto_vydania, vydanie, klucove_slova) " +
-            "values (?,?,?,?,?,?,?,?)";
+            "(archivacne_cislo, rok_vydania, nazov,ISBN, ISSN, miesto_vydania, vydanie, klucove_slova, podnazov) " +
+            "values (?,?,?,?,?,?,?,?,?)";
 
     public ResultSet insertIntoDiela(Dielo dielo) {
         ResultSet rs = null;
@@ -83,11 +83,32 @@ public class DatabaseStarScheme {
                 psDielo.setString(1, dielo.getArchivacne_cislo());
                 psDielo.setString(2, dielo.getRok_vydania());
                 psDielo.setString(3, dielo.getNazov());
-                psDielo.setString(4, dielo.getISBN());
-                psDielo.setString(5, dielo.getISSN());
+                if (dielo.getISBN() == null) {
+                    psDielo.setNull(4, Types.VARCHAR);
+                }else{
+                    psDielo.setString(4, dielo.getISBN());
+                }
+                if (dielo.getISSN() == null) {
+                    psDielo.setNull(5, Types.VARCHAR);
+                }else{
+                    psDielo.setString(5, dielo.getISSN());
+                }
                 psDielo.setString(6, dielo.getMiesto_vydania());
-                psDielo.setString(7, dielo.getVydanie());
-                psDielo.setString(8, dielo.getKlucove_slova());
+                if (dielo.getVydanie() == null) {
+                    psDielo.setNull(7, Types.VARCHAR);
+                }else{
+                    psDielo.setString(7, dielo.getVydanie());
+                }
+                if (dielo.getKlucove_slova() == null){
+                    psDielo.setNull(8, Types.VARCHAR);
+                }else {
+                    psDielo.setString(8, dielo.getKlucove_slova()); //TODO klucove slova
+                }
+                if (dielo.getPodnazov() == null){
+                    psDielo.setNull(9, Types.VARCHAR);
+                }else {
+                    psDielo.setString(9, dielo.getPodnazov());
+                }
 
 
                 psDielo.executeUpdate();
@@ -159,7 +180,7 @@ public class DatabaseStarScheme {
         //private String iPracovisko = "insert ignore into pracovisko set nazov = ?, nazov_fakulty = ?, skratka_fakulty = ?";
 //    private String iPracovisko = "IF NOT EXISTS (SELECT * FROM pracovisko WHERE nazov = ?)" +
 //        "    insert into pracovisko (nazov, nazov_fakulty, skratka_fakulty) values (?,?, ?)";
-        public ResultSet insetIntopracivosko (String nazov, String nazov_fakulty, String skartka_fakulty){
+        public ResultSet insetIntoPracivosko(String nazov, String nazov_fakulty, String skartka_fakulty){
             ResultSet rs = null;
 
             try {
@@ -257,16 +278,16 @@ public class DatabaseStarScheme {
                 "(dieloId,pracoviskoId,autorId, kategoriaId, casVydaniaId, pocetStran) " +
                 "values (?,?,?,?,?,?)";
 
-        public ResultSet insertIntoFact ( long dieloId, long pracoviskoId, long autorId, long kategoriaId,
-        long casVydaniaId, long pocetStran){
+        public ResultSet insertIntoFact ( int dieloId, int pracoviskoId, int autorId, int kategoriaId,
+        int casVydaniaId, double pocetStran){
             ResultSet rs = null;
             try {
-                psFactTable.setInt(1, (int) dieloId);
-                psFactTable.setInt(2, (int) pracoviskoId);
-                psFactTable.setInt(3, (int) autorId);
-                psFactTable.setInt(4, (int) kategoriaId);
-                psFactTable.setInt(5, (int) casVydaniaId);
-                psFactTable.setInt(6, (int) pocetStran);
+                psFactTable.setInt(1, dieloId);
+                psFactTable.setInt(2, pracoviskoId);
+                psFactTable.setInt(3, autorId);
+                psFactTable.setInt(4, kategoriaId);
+                psFactTable.setInt(5, casVydaniaId);
+                psFactTable.setDouble(6, pocetStran);
 
 
                 psFactTable.executeUpdate();

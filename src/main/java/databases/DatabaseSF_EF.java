@@ -22,8 +22,9 @@ public class DatabaseSF_EF {
         return singleInstance;
     }
 
-    String getDataForSchemeString = "select a.Praca_id, a.Nazov, a.isbn, a.issn, a.miesto_vydania, a.archiv_id, a.rok_vydania, c.Nazov, d.Nazov, e.Meno, e.Priezvisko, a.Kat_EPC ,a.Pocet_stran " +
-            "from sf_ef.praca a join sf_ef.praca_autor_pracovisko b on a.Praca_ID = b.Praca_ID join sf_ef.pracovisko c on b.Pracovisko_ID = c.Pracovisko_ID join sf_ef.fakulta d on c.Fakulta_ID = d.Fakulta_ID join sf_ef.autor e on b.Autor_ID = e.Autor_ID;";
+    String getDataForSchemeString = "select a.Praca_id, a.Nazov, a.isbn, a.issn, a.miesto_vydania, a.archiv_id, a.rok_vydania, c.Nazov, d.Nazov, e.Meno, e.Priezvisko, a.Kat_EPC, a.Pocet_stran, b.Percent_podiel, a.Vydavatel, a.Podnazov " +
+            "from sf_ef.praca a join sf_ef.praca_autor_pracovisko b on a.Praca_ID = b.Praca_ID join sf_ef.pracovisko c on b.Pracovisko_ID = c.Pracovisko_ID join sf_ef.fakulta d on c.Fakulta_ID = d.Fakulta_ID join sf_ef.autor e on b.Autor_ID = e.Autor_ID " +
+            "where a.Pocet_stran > 0 and b.Percent_podiel > 0";
 
     public ResultSet getDataForStarSchema(){
 

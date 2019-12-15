@@ -12,6 +12,7 @@ public class DatabaseFEI_FU {
     private Statement statement;
     private PreparedStatement psPodielSelect;
     private PreparedStatement psPodielUpdate;
+    private PreparedStatement psGetDataForScheme;
 
     private DatabaseFEI_FU(){
         openConnection();
@@ -39,6 +40,7 @@ public class DatabaseFEI_FU {
                 statement = con.createStatement();
                 psPodielUpdate = con.prepareStatement(uPodiel);
                 psPodielSelect = con.prepareStatement(sPodiel);
+                psGetDataForScheme = con.prepareStatement(sDataForStarScheme, Statement.RETURN_GENERATED_KEYS);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -99,5 +101,31 @@ public class DatabaseFEI_FU {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private String sDataForStarScheme = "select p.title, p.subtitle, p.ISBNISSN, p.edition, p.year, p.journal, p.place, p.publisher, p.arch_num, p.pages, ap.contribution, a.first_name, a.last_name, d.name, f.name, p.category_EPC, p.id_publication " +
+            "from fei_fu.publication p " +
+            "join fei_fu.author_publication ap " +
+            "on p.id_publication = ap.id_publication " +
+            "join fei_fu.author a " +
+            "on a.id_author = ap.id_author " +
+            "join fei_fu.department_publication dp " +
+            "on p.id_publication = dp.id_publication " +
+            "join fei_fu.department d " +
+            "on dp.id_department = d.id_department " +
+            "join fei_fu.faculty f " +
+            "on d.id_faculty = f.id_faculty " +
+            "where p.pages > 0 and ap.contribution > 0";
+
+    public ResultSet getDataForStarScheme(){
+
+        ResultSet rs = null;
+        try {
+            rs = psGetDataForScheme.executeQuery();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
     }
 }

@@ -18,6 +18,7 @@ public class DatabaseREKT_SJF {
     private PreparedStatement psAutorSelect;
     private PreparedStatement psAutorUpdate;
     private PreparedStatement psAutorDelete;
+    private PreparedStatement psGetDataForScheme;
 
     private DatabaseREKT_SJF(){
         openConnection();
@@ -50,6 +51,7 @@ public class DatabaseREKT_SJF {
                 psAutorSelect = con.prepareStatement(sAutor);
                 psAutorUpdate = con.prepareStatement(uAutor);
                 psAutorDelete = con.prepareStatement(dAutor);
+                psGetDataForScheme = con.prepareStatement(sDataForStarScheme, Statement.RETURN_GENERATED_KEYS);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -68,6 +70,7 @@ public class DatabaseREKT_SJF {
             psAutorSelect.close();
             psAutorUpdate.close();
             psAutorDelete.close();
+            psGetDataForScheme.close();
 
             if (con != null)
                 con.close();
@@ -209,5 +212,24 @@ public class DatabaseREKT_SJF {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private String sDataForStarScheme = "select e.title, e.isbn, e.issn, e.publisher, e.arch_num, e.year, e.workplace, e.epc_cat, e.numberOfPages, a.name, ea.part, e.id, e.edition " +
+            "from rekt_sjf.epcs e " +
+            "join rekt_sjf.epcs_authors ea " +
+            "on e.id = ea.epc_id " +
+            "join  rekt_sjf.authors a " +
+            "on ea.author_id = a.id " +
+            "where e.numberOfPages > 0 and ea.part > 0";
+
+    public ResultSet getDataForStarScheme(){
+        ResultSet rs = null;
+        try {
+            rs = psGetDataForScheme.executeQuery();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
     }
 }
