@@ -30,7 +30,17 @@ public class StarSchemeFEI_FU {
             }
             dielo.setVydanie(rs.getString(4));
             dielo.setRok_vydania(rs.getString(5));
-            String miestoVydania = rs.getString(6) +" & "+ rs.getString(7) +" & "+ rs.getString(8);
+            String miestoVydania = null;
+            if (rs.getString(6)!=null) {
+                miestoVydania = rs.getString(6);
+            }
+            if (rs.getString(7)!=null) {
+                miestoVydania += miestoVydania != null ? " & "+rs.getString(7) : rs.getString(7);
+            }
+            if (rs.getString(8)!=null) {
+                miestoVydania += miestoVydania != null ? " & "+rs.getString(8) : rs.getString(8);
+            }
+
             dielo.setMiesto_vydania(miestoVydania);
             dielo.setArchivacne_cislo(rs.getString(9));
             dielo.setKlucove_slova(db.getKlucoveSlova(rs.getInt(17)));

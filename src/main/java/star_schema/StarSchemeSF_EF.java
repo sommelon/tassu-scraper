@@ -16,7 +16,14 @@ public class StarSchemeSF_EF {
         try {
             while (rs.next()) {
                 double pocetStranNaAutora = (double) rs.getInt(13)*rs.getInt(14)/100;
-                String miestoVydania = rs.getString(5) +" & "+ rs.getString(15);
+
+                String miestoVydania = null;
+                if (rs.getString(5)!=null) {
+                    miestoVydania = rs.getString(5);
+                }
+                if (rs.getString(15)!=null) {
+                    miestoVydania += miestoVydania != null ? " & "+rs.getString(15) : rs.getString(15);
+                }
 
                 System.out.println("------------------------------------------------------------\n");
 
