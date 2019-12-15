@@ -16,7 +16,7 @@ public class StarSchemeFBERG_LF {
         ResultSet rs = db.getDataForStarSchema();
         try {
             while (rs.next()) {
-                double pocetStranNaAutora = (double) rs.getInt(16)/rs.getInt(17);
+                double pocetStranNaAutora = (double) rs.getInt(16)*rs.getInt(17)/100;
                 System.out.println("------------------------------------------------------------\n");
 
                 System.out.println("Nazov: " + rs.getString(2));
@@ -51,7 +51,7 @@ public class StarSchemeFBERG_LF {
                 autor.setPriezvisko(rs.getString(13));
                 ResultSet rsAutor = databaseStarScheme.insetIntoAutor(autor);
 
-                ResultSet rsPracovisko = databaseStarScheme.insetIntoPracivosko(rs.getString(9),rs.getString(10), rs.getString(11));
+                ResultSet rsPracovisko = databaseStarScheme.insetIntoPracovisko(rs.getString(9),rs.getString(10), rs.getString(11));
                 ResultSet rsCas = databaseStarScheme.insertIntoCas(rs.getString(8));
                 ResultSet rsKategoria = databaseStarScheme.insertIntoKategoria(rs.getString(14),rs.getString(15));
 

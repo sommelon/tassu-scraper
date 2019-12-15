@@ -13,6 +13,7 @@ public class DatabaseFEI_FU {
     private PreparedStatement psPodielSelect;
     private PreparedStatement psPodielUpdate;
     private PreparedStatement psGetDataForScheme;
+    private PreparedStatement psKluc;
 
     private DatabaseFEI_FU(){
         openConnection();
@@ -41,6 +42,7 @@ public class DatabaseFEI_FU {
                 psPodielUpdate = con.prepareStatement(uPodiel);
                 psPodielSelect = con.prepareStatement(sPodiel);
                 psGetDataForScheme = con.prepareStatement(sDataForStarScheme, Statement.RETURN_GENERATED_KEYS);
+                psKluc = con.prepareStatement(sKluc);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -127,5 +129,28 @@ public class DatabaseFEI_FU {
             e.printStackTrace();
         }
         return rs;
+    }
+
+    String sKluc = "select k.value from fei_fu.keyword k " +
+            "join fei_fu.publication_keyword pk on pk.id_keyword = k.id_keyword " +
+            "where pk.id_publication = ?";
+    public String getKlucoveSlova(int dieloId){
+        ResultSet rs;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            psKluc.setInt(1, dieloId);
+            rs = psKluc.executeQuery();
+            while (rs.next()){
+                stringBuilder.append(rs.getString(1));
+                stringBuilder.append(", ");
+            }
+            if(stringBuilder.length()>2) {
+                stringBuilder.substring(0, stringBuilder.length() - 2);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
     }
 }

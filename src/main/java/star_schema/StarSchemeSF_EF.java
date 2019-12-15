@@ -15,7 +15,7 @@ public class StarSchemeSF_EF {
         ResultSet rs = databaseSF_ef.getDataForStarSchema();
         try {
             while (rs.next()) {
-                double pocetStranNaAutora = (double) rs.getInt(13)/rs.getInt(14);
+                double pocetStranNaAutora = (double) rs.getInt(13)*rs.getInt(14)/100;
                 String miestoVydania = rs.getString(5) +" & "+ rs.getString(15);
 
                 System.out.println("------------------------------------------------------------\n");
@@ -42,7 +42,6 @@ public class StarSchemeSF_EF {
                 dielo.setArchivacne_cislo(rs.getString(6));
                 dielo.setRok_vydania(rs.getString(7));
                 dielo.setKlucove_slova(databaseSF_ef.getKlucoveSlova(rs.getInt(1)));
-                dielo.setPodnazov(databaseSF_ef.getKlucoveSlova(rs.getInt(1)));
                 ResultSet rsDielo = databaseStarScheme.insertIntoDiela(dielo);
 
                 Autor autor = new Autor();
@@ -50,7 +49,7 @@ public class StarSchemeSF_EF {
                 autor.setPriezvisko(rs.getString(11));
                 ResultSet rsAutor = databaseStarScheme.insetIntoAutor(autor);
 
-                ResultSet rsPracovisko = databaseStarScheme.insetIntoPracivosko(rs.getString(8), rs.getString(9), rs.getString(9).contains("Stavebná fakulta") ? "SF" : "EF");
+                ResultSet rsPracovisko = databaseStarScheme.insetIntoPracovisko(rs.getString(8), rs.getString(9), rs.getString(9).contains("Stavebná fakulta") ? "SF" : "EF");
                 ResultSet rsCas = databaseStarScheme.insertIntoCas(rs.getString(7));
                 ResultSet rsKategoria = databaseStarScheme.insertIntoKategoria(katPopis(rs.getString(12)), rs.getString(12));
 

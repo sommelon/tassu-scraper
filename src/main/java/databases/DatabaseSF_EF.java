@@ -78,7 +78,7 @@ public class DatabaseSF_EF {
                 stringBuilder.append(", ");
             }
             if(stringBuilder.length()>2) {
-                stringBuilder.substring(0, stringBuilder.length() - 3);
+                stringBuilder.substring(0, stringBuilder.length() - 2);
             }
         } catch (SQLException e) {
             e.printStackTrace();

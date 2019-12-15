@@ -404,7 +404,7 @@ public class DatabaseFBERG_LF {
 
     public String getKlucoveSlova(int dieloId){
         String query = "select a.dielo_id, b.klucove_slovo from fberg_lf.dielo_klucove_slovo a join fberg_lf.klucove_slova b on a.klucove_slovo_id = b.klucove_slovo_id where dielo_id = " +dieloId;
-        ResultSet rs=null;
+        ResultSet rs;
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
@@ -414,14 +414,12 @@ public class DatabaseFBERG_LF {
                 stringBuilder.append(", ");
             }
             if(stringBuilder.length()>2) {
-                stringBuilder.substring(0, stringBuilder.length() - 3);
+                stringBuilder.substring(0, stringBuilder.length() - 2);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return stringBuilder.toString();
-
-
     }
 
     public ResultSet selectAutorDieloPracovisko(){

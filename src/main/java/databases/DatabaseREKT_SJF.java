@@ -19,6 +19,7 @@ public class DatabaseREKT_SJF {
     private PreparedStatement psAutorUpdate;
     private PreparedStatement psAutorDelete;
     private PreparedStatement psGetDataForScheme;
+    private PreparedStatement psKluc;
 
     private DatabaseREKT_SJF(){
         openConnection();
@@ -52,6 +53,7 @@ public class DatabaseREKT_SJF {
                 psAutorUpdate = con.prepareStatement(uAutor);
                 psAutorDelete = con.prepareStatement(dAutor);
                 psGetDataForScheme = con.prepareStatement(sDataForStarScheme, Statement.RETURN_GENERATED_KEYS);
+                psKluc = con.prepareStatement(sKluc);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -231,5 +233,28 @@ public class DatabaseREKT_SJF {
             e.printStackTrace();
         }
         return rs;
+    }
+
+    String sKluc = "SELECT k.name FROM rekt_sjf.keywords k " +
+            "join rekt_sjf.epcs_keywords ek on ek.keyword_id = k.id " +
+            "where ek.epc_id = ?";
+    public String getKlucoveSlova(int dieloId){
+        ResultSet rs;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            psKluc.setInt(1, dieloId);
+            rs = psKluc.executeQuery();
+            while (rs.next()){
+                stringBuilder.append(rs.getString(1));
+                stringBuilder.append(", ");
+            }
+            if(stringBuilder.length()>2) {
+                stringBuilder.substring(0, stringBuilder.length() - 2);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
     }
 }

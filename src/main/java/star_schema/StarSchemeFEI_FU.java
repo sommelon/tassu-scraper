@@ -31,16 +31,13 @@ public class StarSchemeFEI_FU {
             String miestoVydania = rs.getString(6) +" & "+ rs.getString(7) +" & "+ rs.getString(8);
             dielo.setMiesto_vydania(miestoVydania);
             dielo.setArchivacne_cislo(rs.getString(9));
-            //todo kl. slova
-            int dieloID = rs.getInt(17);
-//            dielo.setKlucove_slova();
-
+            dielo.setKlucove_slova(db.getKlucoveSlova(rs.getInt(17)));
             ResultSet rsDielo = dbs.insertIntoDiela(dielo);
             ResultSet rsCasVydania = dbs.insertIntoCas(dielo.getRok_vydania());
-            ResultSet rsPracovisko = dbs.insetIntoPracivosko(rs.getString(14), rs.getString(15), "");
+            ResultSet rsPracovisko = dbs.insetIntoPracovisko(rs.getString(14), rs.getString(15), "");
             ResultSet rsKategoria = dbs.insertIntoKategoria("", rs.getString(16));
             int pocetStranDiela = rs.getInt(10);
-            double pocetStranNaAutora = (double) pocetStranDiela/rs.getInt(11);
+            double pocetStranNaAutora = (double) pocetStranDiela*rs.getInt(11)/100;
 
             autor.setMeno(rs.getString(12));
             autor.setPriezvisko(rs.getString(13));

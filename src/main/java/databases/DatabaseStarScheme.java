@@ -4,6 +4,8 @@ import tabulky.Autor;
 import tabulky.Dielo;
 
 import java.sql.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DatabaseStarScheme {
     private static DatabaseStarScheme singleInstance = null;
@@ -93,7 +95,11 @@ public class DatabaseStarScheme {
                 }else{
                     psDielo.setString(5, dielo.getISSN());
                 }
-                psDielo.setString(6, dielo.getMiesto_vydania());
+                if (dielo.getMiesto_vydania() == null) {
+                    psDielo.setNull(6, Types.VARCHAR);
+                }else {
+                    psDielo.setString(6, dielo.getMiesto_vydania());
+                }
                 if (dielo.getVydanie() == null) {
                     psDielo.setNull(7, Types.VARCHAR);
                 }else{
@@ -102,7 +108,7 @@ public class DatabaseStarScheme {
                 if (dielo.getKlucove_slova() == null){
                     psDielo.setNull(8, Types.VARCHAR);
                 }else {
-                    psDielo.setString(8, dielo.getKlucove_slova()); //TODO klucove slova
+                    psDielo.setString(8, dielo.getKlucove_slova());
                 }
                 if (dielo.getPodnazov() == null){
                     psDielo.setNull(9, Types.VARCHAR);
@@ -180,7 +186,7 @@ public class DatabaseStarScheme {
         //private String iPracovisko = "insert ignore into pracovisko set nazov = ?, nazov_fakulty = ?, skratka_fakulty = ?";
 //    private String iPracovisko = "IF NOT EXISTS (SELECT * FROM pracovisko WHERE nazov = ?)" +
 //        "    insert into pracovisko (nazov, nazov_fakulty, skratka_fakulty) values (?,?, ?)";
-        public ResultSet insetIntoPracivosko(String nazov, String nazov_fakulty, String skartka_fakulty){
+        public ResultSet insetIntoPracovisko(String nazov, String nazov_fakulty, String skartka_fakulty){
             ResultSet rs = null;
 
             try {
@@ -248,15 +254,19 @@ public class DatabaseStarScheme {
                 "(rok) " +
                 "values (?)";
 
+        Pattern rokP = Pattern.compile("[0-9]{4}");
         public ResultSet insertIntoCas (String rok){
+            Matcher m = rokP.matcher(rok);
+            m.find();
+            int rokInt = Integer.parseInt(m.group(0));
+
             ResultSet rs = null;
             try {
-                psSelectCas.setString(1, rok);
+                psSelectCas.setInt(1, rokInt);
                 ResultSet rsSelectCas = psSelectCas.executeQuery();
 
                 if (!rsSelectCas.next()) {
-                    psCas.setString(1, rok);
-
+                    psCas.setInt(1, rokInt);
 
                     psCas.executeUpdate();
                     rs = psCas.getGeneratedKeys();

@@ -24,14 +24,13 @@ public class StarSchemeREKT_SJF {
             dielo.setMiesto_vydania(rs.getString(4));
             dielo.setVydanie(rs.getString(13));
             dielo.setArchivacne_cislo(rs.getString(5));
+            dielo.setKlucove_slova(db.getKlucoveSlova(rs.getInt(12)));
             ResultSet rsDielo = dbs.insertIntoDiela(dielo);
             ResultSet rsCasVydania = dbs.insertIntoCas(rs.getString(6));
-            ResultSet rsPracovisko = dbs.insetIntoPracivosko(rs.getString(7), "", "");
+            ResultSet rsPracovisko = dbs.insetIntoPracovisko(rs.getString(7), "", "");
             ResultSet rsKategoria = dbs.insertIntoKategoria("", rs.getString(8));
             int pocetStranDiela = Integer.parseInt(rs.getString(9));
-            double pocetStranNaAutora = (double) pocetStranDiela/rs.getInt(11);
-            //todo kl. slova
-            int dieloId = rs.getInt(12);
+            double pocetStranNaAutora = (double) pocetStranDiela*rs.getInt(11)/100;
 
             System.out.println("------------------------------------------------------------\n");
 
