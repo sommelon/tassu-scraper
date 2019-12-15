@@ -53,9 +53,34 @@ public class DatabaseStarScheme {
                 psSelectAutor = con.prepareStatement(selectAutor, Statement.RETURN_GENERATED_KEYS);
                 psSelectCas = con.prepareStatement(selectCas,Statement.RETURN_GENERATED_KEYS);
                 psSelectDielo = con.prepareStatement(selectDielo,Statement.RETURN_GENERATED_KEYS);
+
+                psUpdateMiesto = con.prepareStatement("update star_schema.dielo set miesto_vydania = ? where dieloId = ?");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public ResultSet selectMiesto(){
+        ResultSet rs = null;
+        try {
+            rs = statement.executeQuery("select dieloId, miesto_vydania from star_schema.dielo where miesto_vydania like '%null'");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rs;
+    }
+
+    private PreparedStatement psUpdateMiesto;
+
+
+    public void updateMiesto(String miesto, int dieloId){
+        try {
+            psUpdateMiesto.setString(1, miesto);
+            psUpdateMiesto.setInt(2, dieloId);
+            psUpdateMiesto.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
