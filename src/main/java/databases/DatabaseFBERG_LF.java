@@ -135,7 +135,12 @@ public class DatabaseFBERG_LF {
         return rs;
     }
     String getDataForSchemeString = "select a.dielo_id, a.nazov, a.isbn, a.issn, a.miesto_vydania, a.vydanie, a.archivacne_cislo , a.rok_vydania , c.nazov, d.nazov, d.skratka , e.meno, e.priezvisko, f.popis, f.kod, a.strany, b.percentualny_podiel, a.podnazov " +
-            "from fberg_lf.diela a join fberg_lf.autor_dielo_pracovisko b on a.dielo_id = b.dielo_id join  fberg_lf.pracoviska c on b.pracovisko_id = c.pracovisko_id join fberg_lf.fakulty d on c.fakulta_id = d.fakulta_id  join  fberg_lf.autori e on b.autor_id = e.autor_id join fberg_lf.kategorie f on a.kategoria_id = f.kategoria_id " +
+            "from fberg_lf.diela a " +
+            "join fberg_lf.autor_dielo_pracovisko b on a.dielo_id = b.dielo_id " +
+            "join  fberg_lf.pracoviska c on b.pracovisko_id = c.pracovisko_id " +
+            "join fberg_lf.fakulty d on c.fakulta_id = d.fakulta_id " +
+            "join  fberg_lf.autori e on b.autor_id = e.autor_id " +
+            "join fberg_lf.kategorie f on a.kategoria_id = f.kategoria_id " +
             "where a.strany > 0 and b.percentualny_podiel > 0";
 
     public ResultSet getDataForStarSchema(){

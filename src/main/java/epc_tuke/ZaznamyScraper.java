@@ -143,17 +143,17 @@ public class ZaznamyScraper {
             }
         }
 
-        nextPage();
-    }
-
-    //Prepne na dalsiu stranu
-    private void nextPage() {
         try {
-            goToPage(currentPage+1);
-            scrape();
+            nextPage();
         } catch (NoSuchPageException e){
             System.out.println(ANSI_RED+ "Strana "+ (currentPage+1) +" neexistuje." +ANSI_RESET);
         }
+        scrape();
+    }
+
+    //Prepne na dalsiu stranu
+    private void nextPage() throws NoSuchPageException{
+        goToPage(currentPage+1);
     }
 
     //Prepne na specificku stranu
