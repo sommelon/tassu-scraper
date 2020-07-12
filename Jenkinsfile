@@ -3,19 +3,25 @@ pipeline {
   stages {
     stage('Clean') {
       steps {
-        bat(script: 'mvn clean', returnStdout: true, returnStatus: true)
+        sh 'mvn clean'
       }
     }
 
     stage('Compile') {
       steps {
-        bat(script: 'mvn compile', returnStdout: true, returnStatus: true)
+        sh 'mvn compile'
       }
     }
 
     stage('Install') {
       steps {
-        bat(script: 'mvn install', returnStatus: true, returnStdout: true)
+        sh 'mvn install'
+      }
+    }
+
+    stage('Success') {
+      steps {
+        echo 'Success!'
       }
     }
 
