@@ -90,10 +90,6 @@ public class DatabaseFBERG_LF {
         }
     }
 
-    public Connection getCon() {
-        return con;
-    }
-
     public void closeConnection(){
         try {
             statement.close();
